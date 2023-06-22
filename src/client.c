@@ -75,9 +75,10 @@ int main(int argc, char** argv)
 	}
 
 	ENetAddress address = zero;
-	enet_address_set_host(&address, "at-taxation.at.ply.gg");
-	// enet_address_set_host(&address, "127.0.0.1");
-	address.port = 62555;
+	//enet_address_set_host(&address, "at-taxation.at.ply.gg");
+	enet_address_set_host(&address, "127.0.0.1");
+	//address.port = 62555;
+	address.port = c_port;
 
 	server = enet_host_connect(client, &address, 2, 0);
 	if(server == null)
