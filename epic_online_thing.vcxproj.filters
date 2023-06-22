@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{4c740bc1-921e-47c5-97ff-f7b0d7373245}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\draw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\callbacks.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\compress.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\host.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\list.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\packet.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\peer.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\protocol.c">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\enet\win32.c">
+      <Filter>external</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\client.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\file.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shader_shared.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\time.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\types.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\callbacks.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\enet.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\list.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\protocol.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\time.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\types.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\unix.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\utility.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\enet\win32.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\glcorearb.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb_image.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb_truetype.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\wglext.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\KHR\khrplatform.h">
+      <Filter>external</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

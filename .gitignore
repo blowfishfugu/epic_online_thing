@@ -52,3 +52,7 @@ dkms.conf
 stamp_timer.data
 build/**
 build
+
+.vs
+**/Debug
+**/Release

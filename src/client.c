@@ -10,6 +10,7 @@
 #include <winsock2.h>
 #include <stdio.h>
 #include "external\enet\enet.h"
+
 #include "types.h"
 #include "utils.h"
 #include "math.h"
@@ -21,6 +22,9 @@
 #include "file.h"
 #include "client.h"
 #include "shader_shared.h"
+#include "external/wglext.h"
+#include "external/glcorearb.h"
+
 
 make_list(s_transform_list, s_transform, 1024);
 s_transform_list transforms;
@@ -30,12 +34,11 @@ global u32 my_id = 0;
 global ENetPeer* server;
 global s_lin_arena frame_arena;
 
-#include "draw.c"
 #include "memory.c"
-#include "file.c"
 #include "window.c"
+#include "draw.c"
 #include "shared.c"
-
+#include "file.c"
 
 int main(int argc, char** argv)
 {

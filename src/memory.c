@@ -1,6 +1,4 @@
 
-
-
 func s_lin_arena make_lin_arena(size_t capacity)
 {
 	assert(capacity > 0);
