@@ -118,7 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\config.h" />
-    <ClInclude Include="src\external\glcorearb.h" />
     <ClInclude Include="src\external\KHR\khrplatform.h" />
     <ClInclude Include="src\external\stb_image.h" />
     <ClInclude Include="src\external\stb_truetype.h" />

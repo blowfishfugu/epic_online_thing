@@ -4,8 +4,6 @@
 #include <windows.h>
 
 #include <gl/GL.h>
-#include "external/glcorearb.h"
-#include "external/wglext.h"
 
 #include <winsock2.h>
 #include <stdio.h>
@@ -26,6 +24,7 @@
 #include "shader_shared.h"
 #include "external/wglext.h"
 #include "external/glcorearb.h"
+#include "external/stb_truetype.h"
 
 make_list(s_transform_list, s_transform, 1024);
 s_transform_list transforms;
@@ -59,9 +58,12 @@ int main(int argc, char** argv)
 
 	init_performance();
 
-	frame_arena = make_lin_arena(10 * c_mb);
+	if (enet_initialize() != 0)
+	{
+		error(false);
+	}
 
-	frame_arena = make_lin_arena(1 * c_mb);
+	frame_arena = make_lin_arena(10 * c_mb);
 
 	ENetHost* client = enet_host_create(
 		null /* create a client host */,

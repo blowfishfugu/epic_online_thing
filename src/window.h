@@ -1,5 +1,5 @@
 
-
+#include "external/glcorearb.h"
 #define c_max_keys 1024
 
 typedef struct s_window
