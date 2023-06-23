@@ -36,30 +36,6 @@
     <ClCompile Include="src\window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\external\enet\callbacks.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\compress.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\host.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\list.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\packet.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\peer.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\protocol.c">
-      <Filter>external</Filter>
-    </ClCompile>
-    <ClCompile Include="src\external\enet\win32.c">
-      <Filter>external</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\client.h">
@@ -94,36 +70,6 @@
     </ClInclude>
     <ClInclude Include="src\window.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\callbacks.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\enet.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\list.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\protocol.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\time.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\types.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\unix.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\utility.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\enet\win32.h">
-      <Filter>external</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\glcorearb.h">
-      <Filter>external</Filter>
     </ClInclude>
     <ClInclude Include="src\external\stb_image.h">
       <Filter>external</Filter>

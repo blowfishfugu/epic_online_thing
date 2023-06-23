@@ -102,8 +102,11 @@ int main(int argc, char** argv)
 		char* header = "#version 430 core\n";
 		char* vertex_src = read_file_quick("shaders/vertex.vertex", &frame_arena);
 		char* fragment_src = read_file_quick("shaders/fragment.fragment", &frame_arena);
+		assert(vertex_src && fragment_src); // "couldn't locate shaders in working directory";
+
 		char* vertex_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), vertex_src};
 		char* fragment_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), fragment_src};
+
 		glShaderSource(vertex, array_count(vertex_src_arr), vertex_src_arr, null);
 		glShaderSource(fragment, array_count(fragment_src_arr), fragment_src_arr, null);
 		glCompileShader(vertex);

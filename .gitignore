@@ -56,3 +56,5 @@ build
 .vs
 **/Debug
 **/Release
+/bin
+/tmp

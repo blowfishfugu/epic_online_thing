@@ -7,7 +7,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "epic_online_thing", "epic_o
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "epic_online_server", "epic_online_server.vcxproj", "{12FBA78E-0718-4226-ABAC-05D7CFA2799E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "enet\enet.vcxitems", "{CA8BBCE6-A5ED-4947-BF21-11B75867FD8E}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		enet\enet.vcxitems*{12fba78e-0718-4226-abac-05d7cfa2799e}*SharedItemsImports = 4
+		enet\enet.vcxitems*{3f6186bb-bc2a-4046-b045-e5951dd7ab80}*SharedItemsImports = 4
+		enet\enet.vcxitems*{ca8bbce6-a5ed-4947-bf21-11b75867fd8e}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86

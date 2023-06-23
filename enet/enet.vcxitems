@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{ca8bbce6-a5ed-4947-bf21-11b75867fd8e}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\callbacks.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\compress.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\host.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\list.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\packet.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\peer.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\protocol.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\src\external\enet\win32.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\callbacks.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\enet.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\protocol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\time.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\types.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\unix.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\utility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\win32.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\glcorearb.h" />
+  </ItemGroup>
+</Project>

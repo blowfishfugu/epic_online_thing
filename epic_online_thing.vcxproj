@@ -28,13 +28,15 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
+    <Import Project="enet\enet.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -45,9 +47,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)-$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(TargetName)\$(PlatformTarget)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformTarget)-$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(TargetName)\$(PlatformTarget)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -77,6 +83,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,14 +99,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\external\enet\callbacks.c" />
-    <ClCompile Include="src\external\enet\compress.c" />
-    <ClCompile Include="src\external\enet\host.c" />
-    <ClCompile Include="src\external\enet\list.c" />
-    <ClCompile Include="src\external\enet\packet.c" />
-    <ClCompile Include="src\external\enet\peer.c" />
-    <ClCompile Include="src\external\enet\protocol.c" />
-    <ClCompile Include="src\external\enet\win32.c" />
     <ClCompile Include="src\file.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -120,16 +119,6 @@
   <ItemGroup>
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\config.h" />
-    <ClInclude Include="src\external\enet\callbacks.h" />
-    <ClInclude Include="src\external\enet\enet.h" />
-    <ClInclude Include="src\external\enet\list.h" />
-    <ClInclude Include="src\external\enet\protocol.h" />
-    <ClInclude Include="src\external\enet\time.h" />
-    <ClInclude Include="src\external\enet\types.h" />
-    <ClInclude Include="src\external\enet\unix.h" />
-    <ClInclude Include="src\external\enet\utility.h" />
-    <ClInclude Include="src\external\enet\win32.h" />
-    <ClInclude Include="src\external\glcorearb.h" />
     <ClInclude Include="src\external\KHR\khrplatform.h" />
     <ClInclude Include="src\external\stb_image.h" />
     <ClInclude Include="src\external\stb_truetype.h" />
