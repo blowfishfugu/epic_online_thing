@@ -1,4 +1,3 @@
-
 //have been shocked, wglGetProc("glBufferData") failed, 
 //then remembered that integrated graphic has incomplete gl-standards
 //for notebooks, choose graphicscard instead of embedded intel-graphics.
@@ -38,7 +37,10 @@ X(PFNGLCHECKFRAMEBUFFERSTATUSPROC, glCheckFramebufferStatus) \
 X(PFNGLACTIVETEXTUREPROC, glActiveTexture) \
 X(PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT) \
 X(PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT) \
-X(PFNGLBLENDEQUATIONPROC, glBlendEquation)
+X(PFNGLBLENDEQUATIONPROC, glBlendEquation) \
+X(PFNGLDELETEPROGRAMPROC, glDeleteProgram) \
+X(PFNGLDELETESHADERPROC, glDeleteShader) \
+X(PFNGLUNIFORM1FPROC, glUniform1f)
 
 #define X(type, name) global type name = null;
 m_gl_funcs

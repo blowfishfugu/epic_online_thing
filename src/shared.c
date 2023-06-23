@@ -224,6 +224,70 @@ func void spawn_system(s_level level)
 					make_diagonal_bottom_projectile(entity, c_base_res.x, angle);
 				} break;
 
+				case e_projectile_type_cross:
+				{
+					float x;
+					float y;
+					float size = randf_range(&rng, 15, 44);
+					float speed = randf_range(&rng, 125, 255);
+
+					if ((randu(&rng) & 1) == 0)
+					{
+						x = randf_range(&rng, 0, c_base_res.x / 4);
+					}
+					else
+					{
+						x = randf_range(&rng, c_base_res.x - c_base_res.x / 4, c_base_res.x);
+						speed *= randf_range(&rng, 1.5f, 2.5f);
+					}
+
+					if ((randu(&rng) & 1) == 0)
+					{
+						y = randf_range(&rng, c_base_res.y - c_base_res.y / 8, c_base_res.y);
+					}
+					else
+					{
+						y = randf_range(&rng, 0, c_base_res.y);
+					}
+
+					s_v4 col = v4(randf_range(&rng, 0, 1.0f), randf_range(&rng, 0, 1.0f), randf_range(&rng, 0, 1.0f), 1.0f);
+
+					e.x[entity] = x;
+					e.y[entity] = y;
+					e.sx[entity] = size;
+					e.speed[entity] = speed;
+					e.dir_x[entity] = -1.0f;
+					e.dir_y[entity] = 0.0f;
+					e.color[entity] = col;
+
+					entity = make_projectile();
+					e.x[entity] = x;
+					e.y[entity] = y;
+					e.sx[entity] = size;
+					e.speed[entity] = speed;
+					e.dir_x[entity] = 1.0f;
+					e.dir_y[entity] = 0.0f;
+					e.color[entity] = col;
+
+					entity = make_projectile();
+					e.x[entity] = x;
+					e.y[entity] = y;
+					e.sx[entity] = size;
+					e.speed[entity] = 133;
+					e.dir_x[entity] = 0.0f;
+					e.dir_y[entity] = -1.0f;
+					e.color[entity] = col;
+
+					entity = make_projectile();
+					e.x[entity] = x;
+					e.y[entity] = y;
+					e.sx[entity] = size;
+					e.speed[entity] = 133;
+					e.dir_x[entity] = 0.0f;
+					e.dir_y[entity] = 1.0f;
+					e.color[entity] = col;
+				} break;
+
 				case e_projectile_type_spawner:
 				{
 					e.x[entity] = -100;
@@ -261,8 +325,12 @@ func void init_levels()
 
 	levels[7].spawn_delay[e_projectile_type_diagonal_bottom_left] = speed(3300);
 
+	levels[8].spawn_delay[e_projectile_type_left_basic] = speed(1000);
+	levels[8].spawn_delay[e_projectile_type_right_basic] = speed(1000);
 
-	current_level = 0;
+	levels[9].spawn_delay[e_projectile_type_cross] = speed(2777);
+
+	current_level = 8;
 	#undef speed
 }
 

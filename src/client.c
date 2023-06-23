@@ -3,6 +3,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#ifdef _WIN32
+#include <xinput.h>
+#endif
+
 #include <gl/GL.h>
 
 #include <winsock2.h>
@@ -40,6 +44,7 @@ global e_state state;
 global b8 g_connected;
 global ENetHost* g_client;
 global s_main_menu main_menu;
+global u32 g_program;
 
 #include "memory.c"
 #include "window.c"
@@ -102,31 +107,7 @@ int main(int argc, char** argv)
 
 	u32 vao;
 	u32 ssbo;
-	u32 program;
-	{
-		u32 vertex = glCreateShader(GL_VERTEX_SHADER);
-		u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
-		char* header = "#version 430 core\n";
-		char* vertex_src = read_file_quick("shaders/vertex.vertex", &frame_arena);
-		char* fragment_src = read_file_quick("shaders/fragment.fragment", &frame_arena);
-		assert(vertex_src && fragment_src); // "couldn't locate shaders in working directory";
-
-		char* vertex_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), vertex_src};
-		char* fragment_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), fragment_src};
-
-		glShaderSource(vertex, array_count(vertex_src_arr), vertex_src_arr, null);
-		glShaderSource(fragment, array_count(fragment_src_arr), fragment_src_arr, null);
-		glCompileShader(vertex);
-		char buffer[1024] = zero;
-		check_for_shader_errors(vertex, buffer);
-		glCompileShader(fragment);
-		check_for_shader_errors(fragment, buffer);
-		program = glCreateProgram();
-		glAttachShader(program, vertex);
-		glAttachShader(program, fragment);
-		glLinkProgram(program);
-		glUseProgram(program);
-	}
+	g_program = load_shader("shaders/vertex.vertex", "shaders/fragment.fragment");
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -167,6 +148,10 @@ int main(int argc, char** argv)
 		update_timer += time_passed;
 		while(update_timer >= c_update_delay)
 		{
+			#ifdef _WIN32
+			do_gamepad_shit();
+			#endif // _WIN32
+
 			update_timer -= c_update_delay;
 			update();
 
@@ -174,9 +159,10 @@ int main(int argc, char** argv)
 			{
 				g_input.keys[k_i].count = 0;
 			}
+			char_event_arr.count = 0;
 		}
 
-		render(program);
+		render();
 
 		frame_arena.used = 0;
 
@@ -284,7 +270,7 @@ func void update()
 	}
 }
 
-func void render(u32 program)
+func void render()
 {
 	switch(state)
 	{
@@ -317,7 +303,10 @@ func void render(u32 program)
 		} break;
 	}
 
+	draw_rect(g_window.center, 0, g_window.size, v41f(1), (s_transform){.do_background = true});
+
 	{
+		glUseProgram(g_program);
 		// glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(0.0f);
@@ -326,8 +315,14 @@ func void render(u32 program)
 		// glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_GREATER);
 
-		int location = glGetUniformLocation(program, "window_size");
-		glUniform2fv(location, 1, &g_window.size.x);
+		{
+			int location = glGetUniformLocation(g_program, "window_size");
+			glUniform2fv(location, 1, &g_window.size.x);
+		}
+		{
+			int location = glGetUniformLocation(g_program, "time");
+			glUniform1f(location, total_time);
+		}
 
 		if(transforms.count > 0)
 		{
@@ -354,6 +349,12 @@ func void render(u32 program)
 			}
 		}
 	}
+
+	#ifdef _WIN32
+	#ifdef m_debug
+	hot_reload_shaders();
+	#endif // m_debug
+	#endif // _WIN32
 }
 
 func b8 check_for_shader_errors(u32 id, char* out_error)
@@ -817,4 +818,184 @@ func void connect_to_server()
 
 	g_connected = true;
 
+}
+
+#ifdef _WIN32
+
+global s_gamepad g_gamepads[XUSER_MAX_COUNT];
+
+func void do_gamepad_shit()
+{
+	int buttons[] = {
+		XINPUT_GAMEPAD_DPAD_UP, XINPUT_GAMEPAD_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_LEFT, XINPUT_GAMEPAD_DPAD_RIGHT, XINPUT_GAMEPAD_START,
+		XINPUT_GAMEPAD_BACK, XINPUT_GAMEPAD_LEFT_THUMB, XINPUT_GAMEPAD_RIGHT_THUMB, XINPUT_GAMEPAD_LEFT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		XINPUT_GAMEPAD_A, XINPUT_GAMEPAD_B, XINPUT_GAMEPAD_X, XINPUT_GAMEPAD_Y
+	};
+
+	for(int gamepad_i = 0; gamepad_i < XUSER_MAX_COUNT; gamepad_i++)
+	{
+		s_gamepad* gamepad = &g_gamepads[gamepad_i];
+		XINPUT_STATE xinput_state = zero;
+		DWORD dwResult = XInputGetState(gamepad_i, &xinput_state);
+
+		if(dwResult == ERROR_SUCCESS)
+		{
+			gamepad->left_thumb_x = xinput_state.Gamepad.sThumbLX;
+			for(int button_i = 0; button_i < array_count(buttons); button_i++)
+			{
+				if(xinput_state.Gamepad.wButtons & buttons[button_i])
+				{
+					gamepad->buttons |= buttons[button_i];
+				}
+			}
+		}
+		else
+		{
+		}
+	}
+
+	typedef struct s_button_to_key
+	{
+		int button;
+		int key;
+	} s_button_to_key;
+
+	s_button_to_key button_to_key_arr[] = {
+		// {XINPUT_GAMEPAD_DPAD_UP, key_space},
+		{XINPUT_GAMEPAD_DPAD_DOWN, key_down},
+		{XINPUT_GAMEPAD_DPAD_LEFT, key_left},
+		{XINPUT_GAMEPAD_DPAD_RIGHT, key_right},
+		{XINPUT_GAMEPAD_A, key_space},
+		{XINPUT_GAMEPAD_B, key_down},
+		{XINPUT_GAMEPAD_X, key_down},
+		{XINPUT_GAMEPAD_Y, key_down},
+	};
+
+	for(int gamepad_i = 0; gamepad_i < XUSER_MAX_COUNT; gamepad_i++)
+	{
+		s_gamepad* gamepad = &g_gamepads[gamepad_i];
+
+		for(int map_i = 0; map_i < array_count(button_to_key_arr); map_i++)
+		{
+			s_button_to_key map = button_to_key_arr[map_i];
+			b8 is_down = (gamepad->buttons & map.button) != 0;
+			b8 was_down = (gamepad->previous_buttons & map.button) != 0;
+
+			if(is_down && !was_down)
+			{
+				s_stored_input event = zero;
+				event.is_down = true;
+				event.key = map.key;
+				apply_event_to_input(&g_input, event);
+			}
+			else if(!is_down && was_down)
+			{
+				s_stored_input event = zero;
+				event.is_down = false;
+				event.key = map.key;
+				apply_event_to_input(&g_input, event);
+			}
+		}
+
+		b8 right_now = gamepad->left_thumb_x > 2000;
+		b8 right_before = gamepad->previous_left_thumb_x > 2000;
+		b8 left_now = gamepad->left_thumb_x < -2000;
+		b8 left_before = gamepad->previous_left_thumb_x < -2000;
+		if(right_now && !right_before)
+		{
+			s_stored_input event = zero;
+			event.is_down = true;
+			event.key = key_right;
+			apply_event_to_input(&g_input, event);
+		}
+		else if(!right_now && right_before)
+		{
+			s_stored_input event = zero;
+			event.is_down = false;
+			event.key = key_right;
+			apply_event_to_input(&g_input, event);
+		}
+		if(left_now && !left_before)
+		{
+			s_stored_input event = zero;
+			event.is_down = true;
+			event.key = key_left;
+			apply_event_to_input(&g_input, event);
+		}
+		else if(!left_now && left_before)
+		{
+			s_stored_input event = zero;
+			event.is_down = false;
+			event.key = key_left;
+			apply_event_to_input(&g_input, event);
+		}
+
+		gamepad->previous_buttons = gamepad->buttons;
+		gamepad->buttons = 0;
+		gamepad->previous_left_thumb_x = gamepad->left_thumb_x;
+		gamepad->left_thumb_x = 0;
+
+	}
+
+
+}
+#endif // _WIN32
+
+
+#ifdef _WIN32
+#ifdef m_debug
+global FILETIME last_write_time = zero;
+func void hot_reload_shaders()
+{
+	WIN32_FIND_DATAA find_data = zero;
+	HANDLE handle = FindFirstFileA("shaders/fragment.fragment", &find_data);
+	if(handle == INVALID_HANDLE_VALUE) { return; }
+
+	if(CompareFileTime(&last_write_time, &find_data.ftLastWriteTime) == -1)
+	{
+		// @Note(tkap, 23/06/2023): This can fail because text editor may be locking the file, so we check if it worked
+		u32 new_program = load_shader("shaders/vertex.vertex", "shaders/fragment.fragment");
+		if(new_program)
+		{
+			if(g_program)
+			{
+				glUseProgram(0);
+				glDeleteProgram(g_program);
+			}
+			g_program = load_shader("shaders/vertex.vertex", "shaders/fragment.fragment");
+			last_write_time = find_data.ftLastWriteTime;
+		}
+	}
+
+	FindClose(handle);
+
+}
+#endif // m_debug
+#endif // _WIN32
+
+func u32 load_shader(char* vertex_path, char* fragment_path)
+{
+	u32 vertex = glCreateShader(GL_VERTEX_SHADER);
+	u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	char* header = "#version 430 core\n";
+	char* vertex_src = read_file_quick(vertex_path, &frame_arena);
+	if(!vertex_src || !vertex_src[0]) { return 0; }
+	char* fragment_src = read_file_quick(fragment_path, &frame_arena);
+	if(!fragment_src || !fragment_src[0]) { return 0; }
+	char* vertex_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), vertex_src};
+	char* fragment_src_arr[] = {header, read_file_quick("src/shader_shared.h", &frame_arena), fragment_src};
+	glShaderSource(vertex, array_count(vertex_src_arr), vertex_src_arr, null);
+	glShaderSource(fragment, array_count(fragment_src_arr), fragment_src_arr, null);
+	glCompileShader(vertex);
+	char buffer[1024] = zero;
+	check_for_shader_errors(vertex, buffer);
+	glCompileShader(fragment);
+	check_for_shader_errors(fragment, buffer);
+	u32 program = glCreateProgram();
+	glAttachShader(program, vertex);
+	glAttachShader(program, fragment);
+	glLinkProgram(program);
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+	return program;
 }

@@ -84,4 +84,12 @@
       <Filter>external</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\fragment.fragment">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\vertex.vertex">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

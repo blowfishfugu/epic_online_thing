@@ -17,7 +17,6 @@
 *.pch
 
 # Libraries
-*.lib
 *.a
 *.la
 *.lo
@@ -51,12 +50,12 @@ Mkfile.old
 dkms.conf
 stamp_timer.data
 build/**
-build
 
 .vs
 **/Debug
 **/Release
 /bin
 /tmp
+
 build
 .tags
