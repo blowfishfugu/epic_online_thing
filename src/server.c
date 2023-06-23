@@ -18,7 +18,7 @@
 
 #define c_max_peers 32
 
-make_list(s_peer_list, ENetPeer*, c_max_peers);
+make_list(s_peer_list, ENetPeer*, c_max_peers)
 global s_peer_list peers;
 global s_lin_arena frame_arena;
 global s_entities e;
@@ -32,8 +32,8 @@ global s_rng rng;
 
 int main(int argc, char** argv)
 {
-	argc -= 1;
-	argv += 1;
+	unreferenced(argc);
+	unreferenced(argv);
 
 	init_levels();
 	rng.seed = (u32)__rdtsc();
@@ -87,55 +87,33 @@ int main(int argc, char** argv)
 					// @Note(tkap, 22/06/2023): Send all players to the new client
 					for(int peer_i = 0; peer_i < peers.count; peer_i++)
 					{
-						la_push(&frame_arena);
 						u32 id = peers.elements[peer_i]->connectID;
-						e_packet packet_id = e_packet_another_player_connected;
-						u8* data = la_get(&frame_arena, 1024);
-						u8* cursor = data;
-						b8 dead = true;
-						{
-							int entity = find_player_by_id(id);
-							if(entity != c_invalid_entity)
-							{
-								dead = e.dead[entity];
-							}
-						}
-						buffer_write(&cursor, &packet_id, sizeof(packet_id));
-						buffer_write(&cursor, &id, sizeof(id));
-						buffer_write(&cursor, &dead, sizeof(dead));
-						ENetPacket* packet = enet_packet_create(data, cursor - data, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(event.peer, 0, packet);
-						la_pop(&frame_arena);
+						int entity = find_player_by_id(id);
+						assert(entity != c_invalid_entity);
+
+						s_already_connected_player_from_server data = zero;
+						data.id = id;
+						data.dead = e.dead[entity];
+						data.name = e.name[entity];
+						send_packet(event.peer, e_packet_already_connected_player, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
 					// @Note(tkap, 22/06/2023): Welcome the new client
 					{
-						la_push(&frame_arena);
-						e_packet packet_id = e_packet_welcome;
-						u8* data = la_get(&frame_arena, 1024);
-						u8* cursor = data;
-						buffer_write(&cursor, &packet_id, sizeof(packet_id));
-						buffer_write(&cursor, &event.peer->connectID, sizeof(event.peer->connectID));
-						ENetPacket* packet = enet_packet_create(data, cursor - data, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(event.peer, 0, packet);
-						la_pop(&frame_arena);
+						s_welcome_from_server data = zero;
+						data.id = event.peer->connectID;
+						send_packet(event.peer, e_packet_welcome, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
 					// @Note(tkap, 22/06/2023): Send every other client the new character
 					for(int peer_i = 0; peer_i < peers.count; peer_i++)
 					{
-						la_push(&frame_arena);
 						ENetPeer* peer = peers.elements[peer_i];
-						e_packet packet_id = e_packet_another_player_connected;
-						u8* data = la_get(&frame_arena, 1024);
-						u8* cursor = data;
-						b8 dead = true;
-						buffer_write(&cursor, &packet_id, sizeof(packet_id));
-						buffer_write(&cursor, &event.peer->connectID, sizeof(event.peer->connectID));
-						buffer_write(&cursor, &dead, sizeof(dead));
-						ENetPacket* packet = enet_packet_create(data, cursor - data, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(peer, 0, packet);
-						la_pop(&frame_arena);
+
+						s_another_player_connected_from_server data = zero;
+						data.id = event.peer->connectID;
+						data.dead = true;
+						send_packet(peer, e_packet_another_player_connected, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
 					s_peer_list_add(&peers, event.peer);
@@ -177,16 +155,10 @@ int main(int argc, char** argv)
 
 					for(int peer_i = 0; peer_i < peers.count; peer_i++)
 					{
-						la_push(&frame_arena);
 						ENetPeer* peer = peers.elements[peer_i];
-						e_packet packet_id = e_packet_player_disconnected;
-						u8* data = la_get(&frame_arena, 1024);
-						u8* cursor = data;
-						buffer_write(&cursor, &packet_id, sizeof(packet_id));
-						buffer_write(&cursor, &id, sizeof(id));
-						ENetPacket* packet = enet_packet_create(data, cursor - data, ENET_PACKET_FLAG_RELIABLE);
-						enet_peer_send(peer, 0, packet);
-						la_pop(&frame_arena);
+						s_player_disconnected_from_server data = zero;
+						data.id = id;
+						send_packet(peer, e_packet_player_disconnected, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
 					printf("Someone disconnected!\n");
@@ -237,10 +209,10 @@ func void update()
 	level_timer += delta;
 	if(level_timer >= c_level_duration && at_least_one_player_alive)
 	{
-		begin_packet(e_packet_beat_level);
-			buffer_write(&write_cursor, &current_level, sizeof(current_level));
-			buffer_write(&write_cursor, &rng.seed, sizeof(rng.seed));
-		broadcast_packet(host, ENET_PACKET_FLAG_RELIABLE);
+		s_beat_level_from_server data = zero;
+		data.current_level = current_level;
+		data.seed = rng.seed;
+		broadcast_packet(host, e_packet_beat_level, data, ENET_PACKET_FLAG_RELIABLE);
 
 		log("Level %i beaten", current_level + 1);
 
@@ -255,20 +227,25 @@ func void update()
 		reset_level();
 		revive_every_player();
 
-		begin_packet(e_packet_reset_level);
-			buffer_write(&write_cursor, &current_level, sizeof(current_level));
-			buffer_write(&write_cursor, &rng.seed, sizeof(rng.seed));
-		broadcast_packet(host, ENET_PACKET_FLAG_RELIABLE);
+		s_reset_level_from_server data = zero;
+		data.current_level = current_level;
+		data.seed = rng.seed;
+		broadcast_packet(host, e_packet_reset_level, data, ENET_PACKET_FLAG_RELIABLE);
 	}
 
 	for(int i = 0; i < c_num_threads; i++)
 	{
 		move_system(i * c_entities_per_thread, c_entities_per_thread);
 		player_movement_system(i * c_entities_per_thread, c_entities_per_thread);
+		physics_movement_system(i * c_entities_per_thread, c_entities_per_thread);
 	}
 	for(int i = 0; i < c_num_threads; i++)
 	{
 		bounds_check_system(i * c_entities_per_thread, c_entities_per_thread);
+	}
+	for(int i = 0; i < c_num_threads; i++)
+	{
+		projectile_spawner_system(i * c_entities_per_thread, c_entities_per_thread);
 	}
 }
 
@@ -282,8 +259,7 @@ func void parse_packet(ENetEvent event)
 
 		case e_packet_player_update:
 		{
-			float x = *(float*)buffer_read(&cursor, sizeof(float));
-			float y = *(float*)buffer_read(&cursor, sizeof(float));
+			s_player_update_from_client data = *(s_player_update_from_client*)cursor;
 
 			// @TODO(tkap, 22/06/2023): We should probably check that the sender is an actual client?
 			// @Note(tkap, 22/06/2023): Set the new player data to everyone else except the sender
@@ -292,24 +268,18 @@ func void parse_packet(ENetEvent event)
 				ENetPeer* peer = peers.elements[peer_i];
 				if(peer->connectID == event.peer->connectID) { continue; }
 
-				la_push(&frame_arena);
-				e_packet packet_id_to_send = e_packet_player_update;
-				u8* data = la_get(&frame_arena, 1024);
-				u8* write_cursor = data;
-				buffer_write(&write_cursor, &packet_id_to_send, sizeof(packet_id_to_send));
-				buffer_write(&write_cursor, &event.peer->connectID, sizeof(event.peer->connectID));
-				buffer_write(&write_cursor, &x, sizeof(x));
-				buffer_write(&write_cursor, &y, sizeof(y));
-				ENetPacket* packet = enet_packet_create(data, write_cursor - data, 0);
-				enet_peer_send(peer, 0, packet);
-				la_pop(&frame_arena);
+				s_player_update_from_server out_data = zero;
+				out_data.id = event.peer->connectID;
+				out_data.x = data.x;
+				out_data.y = data.y;
+				send_packet(peer, e_packet_player_update, out_data, 0);
 			}
 
 			int entity = find_player_by_id(event.peer->connectID);
 			if(entity != c_invalid_entity)
 			{
-				e.x[entity] = x;
-				e.y[entity] = y;
+				e.x[entity] = data.x;
+				e.y[entity] = data.y;
 			}
 
 		} break;
@@ -328,9 +298,41 @@ func void parse_packet(ENetEvent event)
 				ENetPeer* peer = peers.elements[peer_i];
 				if(peer->connectID == got_hit_id) { continue; }
 
-				begin_packet(e_packet_player_got_hit)
-					buffer_write(&write_cursor, &got_hit_id, sizeof(got_hit_id));
-				send_packet_peer(peer, ENET_PACKET_FLAG_RELIABLE);
+				s_player_got_hit_from_server data = zero;
+				data.id = got_hit_id;
+				send_packet(peer, e_packet_player_got_hit, data, ENET_PACKET_FLAG_RELIABLE);
+			}
+
+		} break;
+
+		case e_packet_player_name:
+		{
+			u32 player_id = event.peer->connectID;
+			s_player_name_from_client data = *(s_player_name_from_client*)cursor;
+
+			if(data.name.len <= 3 || data.name.len > max_player_name_length)
+			{
+				// @TODO(tkap, 23/06/2023): Kick player?
+				break;
+			}
+
+			int entity = find_player_by_id(player_id);
+			if(entity != c_invalid_entity)
+			{
+				e.name[entity] = data.name;
+				log("Set %u's name to %s", player_id, e.name[entity].data);
+
+				// @Note(tkap, 23/06/2023): Send the name to everyone else
+				for(int peer_i = 0; peer_i < peers.count; peer_i++)
+				{
+					ENetPeer* peer = peers.elements[peer_i];
+					if(peer->connectID == player_id) { continue; }
+
+					s_player_name_from_server out_data = zero;
+					out_data.id = player_id;
+					out_data.name = data.name;
+					send_packet(peer, e_packet_player_name, out_data, ENET_PACKET_FLAG_RELIABLE);
+				}
 			}
 
 		} break;

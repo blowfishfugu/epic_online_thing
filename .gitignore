@@ -58,3 +58,5 @@ build
 **/Release
 /bin
 /tmp
+build
+.tags
