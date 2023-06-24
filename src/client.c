@@ -821,11 +821,11 @@ func void connect_to_server()
 }
 
 #ifdef _WIN32
-
 global s_gamepad g_gamepads[XUSER_MAX_COUNT];
 
 func void do_gamepad_shit()
 {
+#ifdef WITH_GAMEPAD
 	int buttons[] = {
 		XINPUT_GAMEPAD_DPAD_UP, XINPUT_GAMEPAD_DPAD_DOWN, XINPUT_GAMEPAD_DPAD_LEFT, XINPUT_GAMEPAD_DPAD_RIGHT, XINPUT_GAMEPAD_START,
 		XINPUT_GAMEPAD_BACK, XINPUT_GAMEPAD_LEFT_THUMB, XINPUT_GAMEPAD_RIGHT_THUMB, XINPUT_GAMEPAD_LEFT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER,
@@ -937,6 +937,7 @@ func void do_gamepad_shit()
 
 	}
 
+#endif
 
 }
 #endif // _WIN32

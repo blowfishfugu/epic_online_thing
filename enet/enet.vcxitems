@@ -33,6 +33,5 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\unix.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\utility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\enet\win32.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\src\external\glcorearb.h" />
   </ItemGroup>
 </Project>
