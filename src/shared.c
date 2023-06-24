@@ -44,7 +44,7 @@ func void physics_movement_system(int start, int count)
 	}
 }
 
-func int make_entity()
+func int make_entity(void)
 {
 	for(int i = 0; i < c_max_entities; i++)
 	{
@@ -86,6 +86,8 @@ func void zero_entity(int index)
 
 func int find_player_by_id(u32 id)
 {
+	if(id == 0) { return c_invalid_entity; }
+
 	for(int i = 0; i < c_max_entities; i++)
 	{
 		if(!e.active[i]) { continue; }
@@ -106,13 +108,13 @@ func void gravity_system(int start, int count)
 	}
 }
 
-func void bounds_check_system(int start, int count)
+func void player_bounds_check_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
 		int ii = start + i;
 		if(!e.active[ii]) { continue; }
-		if(!e.flags[ii][e_entity_flag_bounds_check]) { continue; }
+		if(!e.flags[ii][e_entity_flag_player_bounds_check]) { continue; }
 
 		float half_x = e.sx[ii] * 0.5f;
 		float half_y = e.sy[ii] * 0.5f;
@@ -129,8 +131,29 @@ func void bounds_check_system(int start, int count)
 	}
 }
 
+func void projectile_bounds_check_system(int start, int count)
+{
+	for(int i = 0; i < count; i++)
+	{
+		int ii = start + i;
+		if(!e.active[ii]) { continue; }
+		if(!e.flags[ii][e_entity_flag_projectile_bounds_check]) { continue; }
 
-func int make_player(u32 player_id, b8 dead)
+		float radius = e.sx[ii];
+		if(
+			e.x[ii] + radius < -c_projectile_out_of_bounds_offset ||
+			e.y[ii] + radius < -c_projectile_out_of_bounds_offset ||
+			e.x[ii] - radius > c_base_res.x + c_projectile_out_of_bounds_offset ||
+			e.y[ii] - radius > c_base_res.y + c_projectile_out_of_bounds_offset
+		)
+		{
+			e.active[ii] = false;
+		}
+	}
+}
+
+
+func int make_player(u32 player_id, b8 dead, s_v4 color)
 {
 	int entity = make_entity();
 	e.x[entity] = c_spawn_pos.x;
@@ -143,13 +166,14 @@ func int make_player(u32 player_id, b8 dead)
 	e.dead[entity] = dead;
 	e.flags[entity][e_entity_flag_draw] = true;
 	e.type[entity] = e_entity_type_player;
+	e.color[entity] = color;
 
 	#ifdef m_client
 	if(player_id == my_id)
 	{
 		e.flags[entity][e_entity_flag_player_movement] = true;
 		e.flags[entity][e_entity_flag_input] = true;
-		e.flags[entity][e_entity_flag_bounds_check] = true;
+		e.flags[entity][e_entity_flag_player_bounds_check] = true;
 		e.flags[entity][e_entity_flag_gravity] = true;
 	}
 	#endif // m_client
@@ -158,7 +182,7 @@ func int make_player(u32 player_id, b8 dead)
 	return entity;
 }
 
-func int make_projectile()
+func int make_projectile(void)
 {
 	int entity = make_entity();
 	assert(entity != c_invalid_entity);
@@ -167,6 +191,7 @@ func int make_projectile()
 	e.flags[entity][e_entity_flag_draw_circle] = true;
 	e.flags[entity][e_entity_flag_expire] = true;
 	e.flags[entity][e_entity_flag_collide] = true;
+	e.flags[entity][e_entity_flag_projectile_bounds_check] = true;
 
 	return entity;
 }
@@ -189,7 +214,7 @@ func void spawn_system(s_level level)
 				case e_projectile_type_top_basic:
 				{
 					e.x[entity] = randf32(&rng) * c_base_res.x;
-					e.y[entity] = -100;
+					e.y[entity] = -c_projectile_spawn_offset;
 					e.dir_y[entity] = 1;
 					e.speed[entity] = randf_range(&rng, 400, 500);
 					e.sx[entity] = randf_range(&rng, 48, 56);
@@ -201,14 +226,14 @@ func void spawn_system(s_level level)
 
 				case e_projectile_type_left_basic:
 				{
-					make_side_projectile(entity, -100, 1);
+					make_side_projectile(entity, -c_projectile_spawn_offset, 1);
 					e.speed[entity] *= level.speed_multiplier[proj_i];
 					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_right_basic:
 				{
-					make_side_projectile(entity, c_base_res.x + 100, -1);
+					make_side_projectile(entity, c_base_res.x + c_projectile_spawn_offset, -1);
 					e.speed[entity] *= level.speed_multiplier[proj_i];
 					handle_instant_movement(entity);
 				} break;
@@ -313,7 +338,7 @@ func void spawn_system(s_level level)
 
 				case e_projectile_type_spawner:
 				{
-					e.x[entity] = -100;
+					e.x[entity] = -c_projectile_spawn_offset;
 					e.y[entity] = c_base_res.y * 0.5f;
 					e.dir_x[entity] = 1;
 					e.speed[entity] = 300;
@@ -332,7 +357,7 @@ func void spawn_system(s_level level)
 	}
 }
 
-func void init_levels()
+func void init_levels(void)
 {
 	#define speed(val) (1000.0f / val)
 
@@ -375,7 +400,7 @@ func void init_levels()
 	#undef speed
 }
 
-func void reset_level()
+func void reset_level(void)
 {
 	level_timer = 0;
 	memset(spawn_timer, 0, sizeof(spawn_timer));

@@ -29,7 +29,7 @@ typedef enum e_packet
 	e_packet_beat_level,
 	e_packet_reset_level,
 	e_packet_player_got_hit,
-	e_packet_player_name,
+	e_packet_player_appearance,
 	e_packet_cheat_next_level,
 	e_packet_cheat_previous_level,
 } e_packet;
@@ -53,6 +53,7 @@ typedef struct s_already_connected_player_from_server
 	u32 id;
 	b8 dead;
 	s_name name;
+	s_v4 color;
 } s_already_connected_player_from_server;
 
 typedef struct s_already_connected_player_from_client
@@ -156,16 +157,18 @@ typedef struct s_player_got_hit_from_client
 	int unused;
 } s_player_got_hit_from_client;
 
-typedef struct s_player_name_from_server
+typedef struct s_player_appearance_from_server
 {
 	u32 id;
 	s_name name;
-} s_player_name_from_server;
+	s_v4 color;
+} s_player_appearance_from_server;
 
-typedef struct s_player_name_from_client
+typedef struct s_player_appearance_from_client
 {
 	s_name name;
-} s_player_name_from_client;
+	s_v4 color;
+} s_player_appearance_from_client;
 
 typedef struct s_cheat_previous_level_from_server
 {
@@ -185,7 +188,8 @@ typedef enum e_entity_flag
 	e_entity_flag_draw,
 	e_entity_flag_draw_circle,
 	e_entity_flag_gravity,
-	e_entity_flag_bounds_check,
+	e_entity_flag_player_bounds_check,
+	e_entity_flag_projectile_bounds_check,
 	e_entity_flag_expire,
 	e_entity_flag_collide,
 	e_entity_flag_projectile_spawner,
@@ -254,18 +258,19 @@ typedef struct s_level
 
 global s_level levels[c_max_levels];
 
-func int make_entity();
+func int make_entity(void);
 func void zero_entity(int index);
 func int find_player_by_id(u32 id);
 func void gravity_system(int start, int count);
-func int make_player(u32 player_id, b8 dead);
-func void init_levels();
-func int make_projectile();
+func int make_player(u32 player_id, b8 dead, s_v4 color);
+func void init_levels(void);
 func void expire_system(int start, int count);
 func void make_diagonal_bottom_projectile(int entity, float x, float angle);
 func void make_diagonal_top_projectile(int entity, float x, float opposite_x);
 func void make_side_projectile(int entity, float x, float x_dir);
 func s_name str_to_name(char* str);
+func int make_entity(void);
+func void init_levels(void);
 
 #define send_packet(peer, packet_id, data, flag) send_packet_(peer, packet_id, &data, sizeof(data), flag)
 func void send_packet_(ENetPeer* peer, e_packet packet_id, void* data, size_t size, int flag);
