@@ -79,19 +79,20 @@ int main(int argc, char** argv)
 	init_levels();
 
 
-	#ifdef _WIN32
-	init_audio();
-	#endif // _WIN32
-
 	assert((c_max_entities % c_num_threads) == 0);
 
 	init_performance();
 
 	frame_arena = make_lin_arena(10 * c_mb);
 
-	jump_sound = load_wav("assets/jump.wav", &frame_arena);
-	jump2_sound = load_wav("assets/jump2.wav", &frame_arena);
-	big_dog_sound = load_wav("assets/big_dog.wav", &frame_arena);
+	#ifdef _WIN32
+	if (init_audio())
+	{
+		jump_sound = load_wav("assets/jump.wav", &frame_arena);
+		jump2_sound = load_wav("assets/jump2.wav", &frame_arena);
+		big_dog_sound = load_wav("assets/big_dog.wav", &frame_arena);
+	}
+	#endif // _WIN32
 
 	s_config config = read_config_or_make_default(&frame_arena, &rng);
 

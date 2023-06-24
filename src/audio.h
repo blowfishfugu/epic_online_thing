@@ -61,5 +61,5 @@ struct s_voice : IXAudio2VoiceCallback
 	void OnVoiceError(void * pBufferContext, HRESULT Error) { unreferenced(pBufferContext); unreferenced(Error);}
 };
 
-func b8 init_audio();
+func bool init_audio();
 func b8 thread_safe_set_bool_to_true(volatile int* var);

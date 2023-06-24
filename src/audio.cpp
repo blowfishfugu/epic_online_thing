@@ -2,7 +2,7 @@
 
 global s_voice voice_arr[c_max_concurrent_sounds];
 
-func b8 init_audio()
+func bool init_audio()
 {
 	HRESULT hr = CoInitializeEx(null, COINIT_MULTITHREADED);
 	if(FAILED(hr)) { return false; }
@@ -37,7 +37,10 @@ func b8 init_audio()
 
 func b8 play_sound(s_sound sound)
 {
-	assert(sound.sample_count > 0);
+	if (sound.sample_count == 0)
+	{
+		return false;
+	}
 	assert(sound.samples);
 
 	XAUDIO2_BUFFER buffer = zero;
