@@ -233,7 +233,7 @@ func void update()
 
 		log("Level %i beaten", current_level + 1);
 
-		current_level += 1;
+		current_level = (current_level+ 1) % c_max_levels;
 		reset_level();
 		revive_every_player();
 	}
@@ -244,7 +244,7 @@ func void update()
 		revive_every_player();
 
 		s_reset_level_from_server data = zero;
-		data.current_level = current_level;
+		data.current_level = current_level % c_max_levels;
 		data.seed = rng.seed;
 		broadcast_packet(host, e_packet_reset_level, data, ENET_PACKET_FLAG_RELIABLE);
 	}
@@ -344,11 +344,11 @@ func void parse_packet(ENetEvent event)
 			if(peers.count > 1) { break; }
 
 			s_beat_level_from_server data = zero;
-			data.current_level = current_level;
+			data.current_level = current_level % c_max_levels;
 			data.seed = rng.seed;
 			broadcast_packet(host, e_packet_beat_level, data, ENET_PACKET_FLAG_RELIABLE);
 
-			current_level += 1;
+			current_level = (current_level + 1) % c_max_levels;
 			reset_level();
 			revive_every_player();
 		} break;
@@ -358,10 +358,10 @@ func void parse_packet(ENetEvent event)
 			if(peers.count > 1) { break; }
 			if(current_level <= 0) { break; }
 
-			current_level -= 1;
+			current_level = (current_level - 1) % c_max_levels;
 
 			s_cheat_previous_level_from_server data = zero;
-			data.current_level = current_level;
+			data.current_level = current_level % c_max_levels;
 			data.seed = rng.seed;
 			broadcast_packet(host, e_packet_cheat_previous_level, data, ENET_PACKET_FLAG_RELIABLE);
 

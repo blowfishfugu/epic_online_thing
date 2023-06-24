@@ -560,7 +560,7 @@ func void parse_packet(ENetEvent event)
 		case e_packet_reset_level:
 		{
 			s_reset_level_from_server data = *(s_reset_level_from_server*)cursor;
-			current_level = data.current_level;
+			current_level = data.current_level % c_max_levels;
 			log("Reset level %i", current_level + 1);
 			rng.seed = data.seed;
 			reset_level();
@@ -596,7 +596,7 @@ func void parse_packet(ENetEvent event)
 		case e_packet_cheat_previous_level:
 		{
 			s_cheat_previous_level_from_server data = *(s_cheat_previous_level_from_server*)cursor;
-			current_level = data.current_level;
+			current_level = data.current_level & c_max_levels;
 			rng.seed = data.seed;
 			reset_level();
 			revive_every_player();

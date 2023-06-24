@@ -18,19 +18,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\draw.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\file.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\shared.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\server.c">
@@ -39,9 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\config.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\file.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\math.h">
@@ -64,12 +52,6 @@
     </ClInclude>
     <ClInclude Include="src\utils.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\window.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\external\glcorearb.h">
-      <Filter>external</Filter>
     </ClInclude>
     <ClInclude Include="src\external\stb_image.h">
       <Filter>external</Filter>
