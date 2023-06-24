@@ -30,7 +30,7 @@
 // }
 
 
-func char* read_file(char* path, s_lin_arena* arena)
+func char* read_file(const char* path, s_lin_arena* arena)
 {
 	FILE* file = fopen(path, "rb");
 	if(!file) { return null; }
@@ -46,7 +46,7 @@ func char* read_file(char* path, s_lin_arena* arena)
 	return data;
 }
 
-func b8 write_file(char* path, void* data, size_t size)
+func b8 write_file(const char* path, void* data, size_t size)
 {
 	assert(size > 0);
 	FILE* file = fopen(path, "wb");

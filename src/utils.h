@@ -36,7 +36,7 @@ func void name##_add(name* list, type element) \
 	list->count += 1; \
 }
 
-func void on_failed_assert(char* cond, char* file, int line);
+func void on_failed_assert(const char* cond, const char* file, int line);
 
 func void* buffer_read(u8** cursor, size_t size)
 {
@@ -51,7 +51,7 @@ func void buffer_write(u8** cursor, void* data, size_t size)
 	*cursor += size;
 }
 
-func char* format_text(char* text, ...)
+func char* format_text(const char* format, ...)
 {
 	#define max_format_text_buffers 16
 	#define max_text_buffer_length 256
@@ -63,12 +63,12 @@ func char* format_text(char* text, ...)
 	memset(current_buffer, 0, max_text_buffer_length);
 
 	va_list args;
-	va_start(args, text);
+	va_start(args, format);
 	#ifdef m_debug
-	int written = vsnprintf(current_buffer, max_text_buffer_length, text, args);
+	int written = vsnprintf(current_buffer, max_text_buffer_length, format, args);
 	assert(written > 0 && written < max_text_buffer_length);
 	#else
-	vsnprintf(current_buffer, max_text_buffer_length, text, args);
+	vsnprintf(current_buffer, max_text_buffer_length, format, args);
 	#endif
 	va_end(args);
 
@@ -78,7 +78,7 @@ func char* format_text(char* text, ...)
 	return current_buffer;
 }
 
-func void on_failed_assert(char* cond, char* file, int line)
+func void on_failed_assert(const char* cond, const char* file, int line)
 {
 	char* text = format_text("FAILED ASSERT IN %s (%i)\n%s\n", file, line, cond);
 	printf("%s\n", text);

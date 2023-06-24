@@ -36,7 +36,7 @@ struct s_input
 };
 
 
-func PROC load_gl_func(char* name);
+func PROC load_gl_func(const char* name);
 LRESULT window_proc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam);
 void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 func b8 is_key_down(int key);

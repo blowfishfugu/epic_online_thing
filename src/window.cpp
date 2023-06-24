@@ -4,9 +4,10 @@
 //nv and amd look for theese exported flags
 //deepdive documentation:
 // https://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
-_declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
-_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-
+extern "C" {
+	_declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+	_declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
 
 #define m_gl_funcs \
 X(PFNGLBUFFERDATAPROC, glBufferData) \
@@ -55,7 +56,7 @@ s_char_event_list char_event_arr;
 
 func void create_window(void)
 {
-	char* class_name = "epic_online_thing_class";
+	const char* class_name = "epic_online_thing_class";
 	HINSTANCE instance = GetModuleHandle(null);
 
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = null;
@@ -188,7 +189,7 @@ func void create_window(void)
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^		window end		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 
-func PROC load_gl_func(char* name)
+func PROC load_gl_func(const char* name)
 {
 	PROC result = wglGetProcAddress(name);
 	if(!result)

@@ -60,13 +60,14 @@ func b8 play_sound(s_sound sound)
 	}
 
 	if(curr_voice == null) { return false; }
+	if (curr_voice->voice)
+	{
+		HRESULT hr = curr_voice->voice->SubmitSourceBuffer(&buffer);
+		if (FAILED(hr)) { return false; }
 
-	HRESULT hr = curr_voice->voice->SubmitSourceBuffer(&buffer);
-	if(FAILED(hr)) { return false; }
-
-	curr_voice->voice->Start();
-	// curr_voice->sound = sound;
-
+		curr_voice->voice->Start();
+		// curr_voice->sound = sound;
+	}
 	return true;
 }
 
@@ -81,7 +82,7 @@ func b8 thread_safe_set_bool_to_true(volatile int* var)
 	return false;
 }
 
-func s_sound load_wav(char* path, s_lin_arena* arena)
+func s_sound load_wav(const char* path, s_lin_arena* arena)
 {
 
 	s_sound result = zero;
