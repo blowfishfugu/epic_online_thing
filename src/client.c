@@ -8,6 +8,8 @@
 #endif
 
 #include <gl/GL.h>
+#include "external/glcorearb.h"
+#include "external/wglext.h"
 
 #include <winsock2.h>
 #include <stdio.h>
@@ -26,11 +28,12 @@
 #include "client.h"
 #include "rng.h"
 #include "shader_shared.h"
-#include "external/wglext.h"
-#include "external/glcorearb.h"
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_assert assert
 #include "external/stb_truetype.h"
 
-make_list(s_transform_list, s_transform, 1024);
+make_list(s_transform_list, s_transform, 1024)
 s_transform_list transforms;
 s_transform_list text_arr[e_font_count];
 
@@ -46,11 +49,11 @@ global ENetHost* g_client;
 global s_main_menu main_menu;
 global u32 g_program;
 
-#include "memory.c"
-#include "window.c"
 #include "draw.c"
-#include "shared.c"
+#include "memory.c"
 #include "file.c"
+#include "window.c"
+#include "shared.c"
 
 int main(int argc, char** argv)
 {
