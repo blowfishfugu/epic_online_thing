@@ -66,36 +66,7 @@ int main(int argc, char** argv)
 
 	init_performance();
 
-	if (enet_initialize() != 0)
-	{
-		error(false);
-	}
-
 	frame_arena = make_lin_arena(10 * c_mb);
-
-	ENetHost* client = enet_host_create(
-		null /* create a client host */,
-		1, /* only allow 1 outgoing connection */
-		2, /* allow up 2 channels to be used, 0 and 1 */
-		0, /* assume any amount of incoming bandwidth */
-		0 /* assume any amount of outgoing bandwidth */
-	);
-
-	if(client == null)
-	{
-		error(false);
-	}
-
-	ENetAddress address = zero;
-	enet_address_set_host(&address, "at-taxation.at.ply.gg");
-	// enet_address_set_host(&address, "127.0.0.1");
-	address.port = 62555;
-
-	server = enet_host_connect(client, &address, 2, 0);
-	if(server == null)
-	{
-		error(false);
-	}
 
 	create_window();
 
