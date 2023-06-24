@@ -153,6 +153,8 @@ int main(int argc, char** argv)
 			#endif // _WIN32
 
 			update_timer -= c_update_delay;
+			memcpy(e.prev_x, e.x, sizeof(e.x));
+			memcpy(e.prev_y, e.y, sizeof(e.y));
 			update();
 
 			for(int k_i = 0; k_i < c_max_keys; k_i++)
@@ -162,7 +164,9 @@ int main(int argc, char** argv)
 			char_event_arr.count = 0;
 		}
 
-		render();
+		float interpolation_dt = (float)(update_timer / c_update_delay);
+		render(interpolation_dt);
+		memset(e.drawn_last_render, true, sizeof(e.drawn_last_render));
 
 		frame_arena.used = 0;
 
@@ -227,9 +231,19 @@ func void update()
 
 		case e_state_game:
 		{
-			spawn_system(levels[current_level]);
 
-			level_timer += delta;
+			// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv		cheats, for testing start		vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+			#ifdef m_debug
+			if(is_key_pressed(key_add))
+			{
+				send_simple_packet(server, e_packet_cheat_next_level, ENET_PACKET_FLAG_RELIABLE);
+			}
+			if(is_key_pressed(key_subtract))
+			{
+				send_simple_packet(server, e_packet_cheat_previous_level, ENET_PACKET_FLAG_RELIABLE);
+			}
+			#endif // m_debug
+			// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^		cheats, for testing end		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 			for(int i = 0; i < c_num_threads; i++)
 			{
@@ -266,11 +280,15 @@ func void update()
 				data.y = e.y[my_player];
 				send_packet(server, e_packet_player_update, data, 0);
 			}
+
+			level_timer += delta;
+			spawn_system(levels[current_level]);
+
 		} break;
 	}
 }
 
-func void render()
+func void render(float dt)
 {
 	switch(state)
 	{
@@ -297,9 +315,27 @@ func void render()
 		{
 			for(int i = 0; i < c_num_threads; i++)
 			{
-				draw_system(i * c_entities_per_thread, c_entities_per_thread);
-				draw_circle_system(i * c_entities_per_thread, c_entities_per_thread);
+				draw_system(i * c_entities_per_thread, c_entities_per_thread, dt);
+				draw_circle_system(i * c_entities_per_thread, c_entities_per_thread, dt);
 			}
+
+			// @Note(tkap, 23/06/2023): Display how many seconds left to beat the level
+			{
+				float seconds_left = c_level_duration - level_timer;
+				s_v2 pos = v2(
+					g_window.center.x,
+					g_window.size.y * 0.3f
+				);
+				draw_text(format_text("%i", (int)ceilf(seconds_left)), pos, 1, v41f(1), e_font_medium, true, (s_transform)zero);
+			}
+
+			// @Note(tkap, 23/06/2023): Display current level
+			{
+				s_v2 pos = v2(20, 20);
+				draw_text(format_text("Level %i", current_level + 1), pos, 1, v41f(1), e_font_medium, false, (s_transform)zero);
+			}
+
+
 		} break;
 	}
 
@@ -366,7 +402,7 @@ func b8 check_for_shader_errors(u32 id, char* out_error)
 	if(!compile_success)
 	{
 		glGetShaderInfoLog(id, 1024, null, info_log);
-		printf("Failed to compile shader:\n%s", info_log);
+		log("Failed to compile shader:\n%s", info_log);
 
 		if(out_error)
 		{
@@ -422,7 +458,7 @@ func void input_system(int start, int count)
 	}
 }
 
-func void draw_system(int start, int count)
+func void draw_system(int start, int count, float dt)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -430,15 +466,20 @@ func void draw_system(int start, int count)
 		if(!e.active[ii]) { continue; }
 		if(!e.flags[ii][e_entity_flag_draw]) { continue; }
 
+		float true_dt = e.drawn_last_render[ii] ? dt : 1;
+
+		float x = lerp(e.prev_x[ii], e.x[ii], true_dt);
+		float y = lerp(e.prev_y[ii], e.y[ii], true_dt);
+
 		s_v4 color = v41f(1);
 		if(e.dead[ii])
 		{
 			color = v41f(0.25f);
 		}
-		draw_rect(v2(e.x[ii], e.y[ii]), 0, v2(e.sx[ii], e.sy[ii]), color, (s_transform)zero);
+		draw_rect(v2(x, y), 0, v2(e.sx[ii], e.sy[ii]), color, (s_transform)zero);
 
 		s_v2 pos = v2(
-			e.x[ii], e.y[ii]
+			x, y
 		);
 		pos.y -= e.sy[ii];
 
@@ -459,7 +500,7 @@ func void draw_system(int start, int count)
 	}
 }
 
-func void draw_circle_system(int start, int count)
+func void draw_circle_system(int start, int count, float dt)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -467,11 +508,16 @@ func void draw_circle_system(int start, int count)
 		if(!e.active[ii]) { continue; }
 		if(!e.flags[ii][e_entity_flag_draw_circle]) { continue; }
 
+		float true_dt = e.drawn_last_render[ii] ? dt : 1;
+
+		float x = lerp(e.prev_x[ii], e.x[ii], true_dt);
+		float y = lerp(e.prev_y[ii], e.y[ii], true_dt);
+
 		s_v4 light_color = e.color[ii];
 		light_color.w *= 0.2f;
-		draw_light(v2(e.x[ii], e.y[ii]), 0, e.sx[ii] * 8.0f, light_color, (s_transform)zero);
-		draw_circle(v2(e.x[ii], e.y[ii]), 1, e.sx[ii], e.color[ii], (s_transform)zero);
-		draw_circle(v2(e.x[ii], e.y[ii]), 2, e.sx[ii] * 0.7f, v41f(1), (s_transform)zero);
+		draw_light(v2(x, y), 0, e.sx[ii] * 8.0f, light_color, (s_transform)zero);
+		draw_circle(v2(x, y), 1, e.sx[ii], e.color[ii], (s_transform)zero);
+		draw_circle(v2(x, y), 2, e.sx[ii] * 0.7f, v41f(1), (s_transform)zero);
 	}
 }
 
@@ -572,6 +618,17 @@ func void parse_packet(ENetEvent event)
 			}
 		} break;
 
+		#ifdef m_debug
+		case e_packet_cheat_previous_level:
+		{
+			s_cheat_previous_level_from_server data = *(s_cheat_previous_level_from_server*)cursor;
+			current_level = data.current_level;
+			rng.seed = data.seed;
+			reset_level();
+			revive_every_player();
+		} break;
+		#endif // m_debug
+
 		invalid_default_case;
 	}
 }
@@ -589,7 +646,7 @@ func void enet_loop(ENetHost* client, int timeout)
 
 			case ENET_EVENT_TYPE_CONNECT:
 			{
-				printf("Client: connected!\n");
+				log("Connected!");
 
 				s_player_name_from_client data;
 				data.name = main_menu.player_name;
@@ -599,7 +656,7 @@ func void enet_loop(ENetHost* client, int timeout)
 
 			case ENET_EVENT_TYPE_DISCONNECT:
 			{
-				printf("Client: disconnected!\n");
+				log("Disconnected!\n");
 				return;
 			} break;
 
@@ -999,4 +1056,11 @@ func u32 load_shader(char* vertex_path, char* fragment_path)
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 	return program;
+}
+
+func void handle_instant_movement_(int entity)
+{
+	assert(entity != c_invalid_entity);
+	e.prev_x[entity] = e.x[entity];
+	e.prev_y[entity] = e.y[entity];
 }

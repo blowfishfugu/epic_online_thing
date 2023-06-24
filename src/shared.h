@@ -2,6 +2,13 @@
 // #define c_port 9417
 #define c_port 9417
 
+
+#ifdef m_client
+#define handle_instant_movement(entity) handle_instant_movement_(entity)
+#else // m_client
+#define handle_instant_movement(entity)
+#endif
+
 typedef struct s_name
 {
 	int len;
@@ -23,6 +30,8 @@ typedef enum e_packet
 	e_packet_reset_level,
 	e_packet_player_got_hit,
 	e_packet_player_name,
+	e_packet_cheat_next_level,
+	e_packet_cheat_previous_level,
 } e_packet;
 
 #pragma pack(push, 1)
@@ -158,6 +167,12 @@ typedef struct s_player_name_from_client
 	s_name name;
 } s_player_name_from_client;
 
+typedef struct s_cheat_previous_level_from_server
+{
+	int current_level;
+	u32 seed;
+} s_cheat_previous_level_from_server;
+
 
 #pragma pack(pop)
 
@@ -193,10 +208,13 @@ typedef struct s_entities
 	b8 flags[c_max_entities][e_entity_flag_count];
 	b8 jumping[c_max_entities];
 	b8 dead[c_max_entities];
+	b8 drawn_last_render[c_max_entities];
 	e_entity_type type[c_max_entities];
 	int id[c_max_entities];
 	int jumps_done[c_max_entities];
 	u32 player_id[c_max_entities];
+	float prev_x[c_max_entities];
+	float prev_y[c_max_entities];
 	float x[c_max_entities];
 	float y[c_max_entities];
 	float sx[c_max_entities];
@@ -231,6 +249,7 @@ typedef enum e_projectile_type
 typedef struct s_level
 {
 	float spawn_delay[e_projectile_type_count];
+	float speed_multiplier[e_projectile_type_count];
 } s_level;
 
 global s_level levels[c_max_levels];

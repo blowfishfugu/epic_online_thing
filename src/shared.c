@@ -81,6 +81,7 @@ func void zero_entity(int index)
 	e.duration[index] = 0;
 	e.spawn_timer[index] = 0;
 	e.name[index] = (s_name)zero;
+	e.drawn_last_render[index] = false;
 }
 
 func int find_player_by_id(u32 id)
@@ -134,6 +135,7 @@ func int make_player(u32 player_id, b8 dead)
 	int entity = make_entity();
 	e.x[entity] = c_spawn_pos.x;
 	e.y[entity] = c_spawn_pos.y;
+	handle_instant_movement(entity);
 	e.sx[entity] = 32;
 	e.sy[entity] = 64;
 	e.player_id[entity] = player_id;
@@ -151,6 +153,7 @@ func int make_player(u32 player_id, b8 dead)
 		e.flags[entity][e_entity_flag_gravity] = true;
 	}
 	#endif // m_client
+
 
 	return entity;
 }
@@ -186,42 +189,58 @@ func void spawn_system(s_level level)
 				case e_projectile_type_top_basic:
 				{
 					e.x[entity] = randf32(&rng) * c_base_res.x;
+					e.y[entity] = -100;
 					e.dir_y[entity] = 1;
 					e.speed[entity] = randf_range(&rng, 400, 500);
 					e.sx[entity] = randf_range(&rng, 48, 56);
 					e.color[entity] = v4(0.9f, 0.1f, 0.1f, 1.0f);
+
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_left_basic:
 				{
 					make_side_projectile(entity, -100, 1);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_right_basic:
 				{
 					make_side_projectile(entity, c_base_res.x + 100, -1);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_diagonal_left:
 				{
 					make_diagonal_top_projectile(entity, 0, c_base_res.x);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_diagonal_right:
 				{
 					make_diagonal_top_projectile(entity, c_base_res.x, 0);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_diagonal_bottom_left:
 				{
 					float angle = pi * -0.25f;
 					make_diagonal_bottom_projectile(entity, 0.0f, angle);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_diagonal_bottom_right:
 				{
 					float angle = pi * -0.75f;
 					make_diagonal_bottom_projectile(entity, c_base_res.x, angle);
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_cross:
@@ -255,37 +274,41 @@ func void spawn_system(s_level level)
 					e.x[entity] = x;
 					e.y[entity] = y;
 					e.sx[entity] = size;
-					e.speed[entity] = speed;
+					e.speed[entity] = speed * level.speed_multiplier[proj_i];;
 					e.dir_x[entity] = -1.0f;
 					e.dir_y[entity] = 0.0f;
 					e.color[entity] = col;
+					handle_instant_movement(entity);
 
 					entity = make_projectile();
 					e.x[entity] = x;
 					e.y[entity] = y;
 					e.sx[entity] = size;
-					e.speed[entity] = speed;
+					e.speed[entity] = speed * level.speed_multiplier[proj_i];;
 					e.dir_x[entity] = 1.0f;
 					e.dir_y[entity] = 0.0f;
 					e.color[entity] = col;
+					handle_instant_movement(entity);
 
 					entity = make_projectile();
 					e.x[entity] = x;
 					e.y[entity] = y;
 					e.sx[entity] = size;
-					e.speed[entity] = 133;
+					e.speed[entity] = 133 * level.speed_multiplier[proj_i];;
 					e.dir_x[entity] = 0.0f;
 					e.dir_y[entity] = -1.0f;
 					e.color[entity] = col;
+					handle_instant_movement(entity);
 
 					entity = make_projectile();
 					e.x[entity] = x;
 					e.y[entity] = y;
 					e.sx[entity] = size;
-					e.speed[entity] = 133;
+					e.speed[entity] = 133 * level.speed_multiplier[proj_i];;
 					e.dir_x[entity] = 0.0f;
 					e.dir_y[entity] = 1.0f;
 					e.color[entity] = col;
+					handle_instant_movement(entity);
 				} break;
 
 				case e_projectile_type_spawner:
@@ -298,6 +321,9 @@ func void spawn_system(s_level level)
 					e.color[entity] = v4(0.1f, 0.1f, 0.9f, 1.0f);
 					e.spawn_delay[entity] = 1.0f;
 					e.flags[entity][e_entity_flag_projectile_spawner] = true;
+
+					e.speed[entity] *= level.speed_multiplier[proj_i];
+					handle_instant_movement(entity);
 				} break;
 
 				invalid_default_case;
@@ -309,6 +335,15 @@ func void spawn_system(s_level level)
 func void init_levels()
 {
 	#define speed(val) (1000.0f / val)
+
+	for(int level_i = 0; level_i < c_max_levels; level_i++)
+	{
+		for(int proj_i = 0; proj_i < e_projectile_type_count; proj_i++)
+		{
+			levels[level_i].speed_multiplier[proj_i] = 1;
+		}
+	}
+
 	levels[0].spawn_delay[e_projectile_type_top_basic] = speed(3500);
 
 	levels[1].spawn_delay[e_projectile_type_left_basic] = speed(2000);
@@ -330,7 +365,13 @@ func void init_levels()
 
 	levels[9].spawn_delay[e_projectile_type_cross] = speed(2777);
 
-	current_level = 8;
+	levels[10].spawn_delay[e_projectile_type_top_basic] = speed(3000);
+	levels[10].spawn_delay[e_projectile_type_left_basic] = speed(2500);
+
+	levels[11].spawn_delay[e_projectile_type_diagonal_left] = speed(3500);
+	levels[11].spawn_delay[e_projectile_type_diagonal_bottom_right] = speed(2500);
+
+	current_level = 0;
 	#undef speed
 }
 
@@ -360,6 +401,7 @@ func void reset_level()
 		e.jumping[i] = false;
 		e.vel_y[i] = 0;
 		e.jumps_done[i] = 1;
+		handle_instant_movement(i);
 	}
 }
 
@@ -432,6 +474,7 @@ func void projectile_spawner_system(int start, int count)
 				e.dir_x[entity] = cosf(angle);
 				e.dir_y[entity] = sinf(angle);
 				e.color[entity] = v41f(0.5f);
+				handle_instant_movement(entity);
 			}
 		}
 	}
@@ -480,4 +523,15 @@ func s_name str_to_name(char* str)
 	assert(result.len < max_player_name_length);
 	memcpy(result.data, str, result.len + 1);
 	return result;
+}
+
+func void send_simple_packet(ENetPeer* peer, e_packet packet_id, int flag)
+{
+	assert(flag == 0 || flag == ENET_PACKET_FLAG_RELIABLE);
+
+	u8 packet_data[4];
+	u8* cursor = packet_data;
+	buffer_write(&cursor, &packet_id, sizeof(packet_id));
+	ENetPacket* packet = enet_packet_create(packet_data, sizeof(packet_id), flag);
+	enet_peer_send(peer, 0, packet);
 }
