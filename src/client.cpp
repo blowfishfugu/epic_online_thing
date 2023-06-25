@@ -705,8 +705,11 @@ func void parse_packet(ENetEvent event, s_config config)
 				e.time_lived[entity] = data.time_lived;
 			}
 		} break;
-
-		invalid_default_case;
+		default:
+		{
+			//invalid_default_case;
+			log("unknown packet-type: %d", packet_id);
+		}
 	}
 }
 
