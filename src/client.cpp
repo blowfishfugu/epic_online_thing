@@ -34,42 +34,42 @@
 #define STBTT_assert assert
 #include "external/stb_truetype.h"
 
-global s_sarray<s_transform, c_max_entities> transforms;
-global s_sarray<s_transform, c_max_entities> text_arr[e_font_count];
+s_sarray<s_transform, c_max_entities> transforms;
+s_sarray<s_transform, c_max_entities> text_arr[e_font_count];
 
-global s_entities e;
-global u32 my_id = 0;
-global ENetPeer* server;
-global s_lin_arena frame_arena;
-global s_rng rng;
-global s_font g_font_arr[e_font_count];
-global e_state state;
-global b8 g_connected;
-global ENetHost* g_client;
-global s_main_menu main_menu;
-global u32 g_program;
-global float total_time;
+s_entities e;
+u32 my_id = 0;
+ENetPeer* server;
+s_lin_arena frame_arena;
+s_rng rng;
+s_font g_font_arr[e_font_count];
+e_state state;
+b8 g_connected;
+ENetHost* g_client;
+s_main_menu main_menu;
+u32 g_program;
+float total_time;
 
-global s_sound big_dog_sound = zero;
-global s_sound jump_sound = zero;
-global s_sound jump2_sound = zero;
-global s_sound win_sound = zero;
+s_sound big_dog_sound = zero;
+s_sound jump_sound = zero;
+s_sound jump2_sound = zero;
+s_sound win_sound = zero;
 
-global int level_count = 0;
+int level_count = 0;
 
-global s_game_window g_gamewindow;
-global s_input* g_input;
-global s_sarray<s_char_event, 1024>* char_event_arr;
+s_game_window g_gamewindow;
+s_input* g_input;
+s_sarray<s_char_event, 1024>* char_event_arr;
 
-global b8 game_initialized;
-global s_platform_data g_platform_data;
-global s_platform_funcs g_platform_funcs;
+b8 game_initialized;
+s_platform_data g_platform_data;
+s_platform_funcs g_platform_funcs;
 
-global s_game game;
+s_game game;
 
 
 #ifdef _WIN32
-#define X(type, name) global type name = null;
+#define X(type, name) type name = nullptr;
 m_gl_funcs
 #undef X
 #endif // _WIN32
@@ -97,7 +97,7 @@ void update_game(s_platform_data platform_data, s_platform_funcs platform_funcs)
 		m_gl_funcs
 		#undef X
 
-		glDebugMessageCallback(gl_debug_callback, null);
+		glDebugMessageCallback(gl_debug_callback, nullptr);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 		rng.seed = (u32)__rdtsc();
@@ -132,7 +132,7 @@ void update_game(s_platform_data platform_data, s_platform_funcs platform_funcs)
 		glGenBuffers(1, &ssbo);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(transforms.elements), null, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(transforms.elements), nullptr, GL_DYNAMIC_DRAW);
 	}
 	g_gamewindow.width = platform_data.window_width;
 	g_gamewindow.height = platform_data.window_height;
@@ -180,7 +180,7 @@ void update_game(s_platform_data platform_data, s_platform_funcs platform_funcs)
 
 }
 
-func void update(s_config config)
+void update(s_config config)
 {
 
 	switch(state)
@@ -218,7 +218,7 @@ func void update(s_config config)
 						}
 						else
 						{
-							main_menu.error_str = null;
+							main_menu.error_str = nullptr;
 							state = e_state_game;
 							connect_to_server(config);
 							break;
@@ -302,7 +302,7 @@ func void update(s_config config)
 	}
 }
 
-func void render(float dt)
+void render(float dt)
 {
 	switch(state)
 	{
@@ -443,7 +443,7 @@ func void render(float dt)
 	#endif // _WIN32
 }
 
-func b8 check_for_shader_errors(u32 id, char* out_error)
+b8 check_for_shader_errors(u32 id, char* out_error)
 {
 	int compile_success;
 	char info_log[1024];
@@ -451,7 +451,7 @@ func b8 check_for_shader_errors(u32 id, char* out_error)
 
 	if(!compile_success)
 	{
-		glGetShaderInfoLog(id, 1024, null, info_log);
+		glGetShaderInfoLog(id, 1024, nullptr, info_log);
 		log("Failed to compile shader:\n%s", info_log);
 
 		if(out_error)
@@ -464,7 +464,7 @@ func b8 check_for_shader_errors(u32 id, char* out_error)
 	return true;
 }
 
-func void input_system(int start, int count)
+void input_system(int start, int count)
 {
 	b8 go_left = is_key_down(key_a) || is_key_down(key_left);
 	b8 go_right = is_key_down(key_d) || is_key_down(key_right);
@@ -516,7 +516,7 @@ func void input_system(int start, int count)
 	}
 }
 
-func void draw_system(int start, int count, float dt)
+void draw_system(int start, int count, float dt)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -556,7 +556,7 @@ func void draw_system(int start, int count, float dt)
 	}
 }
 
-func void draw_circle_system(int start, int count, float dt)
+void draw_circle_system(int start, int count, float dt)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -575,7 +575,7 @@ func void draw_circle_system(int start, int count, float dt)
 	}
 }
 
-func void parse_packet(ENetEvent event, s_config config)
+void parse_packet(ENetEvent event, s_config config)
 {
 	u8* cursor = event.packet->data;
 	e_packet packet_id = *(e_packet*)buffer_read(&cursor, sizeof(packet_id));
@@ -713,7 +713,7 @@ func void parse_packet(ENetEvent event, s_config config)
 	}
 }
 
-func void enet_loop(ENetHost* client, int timeout, s_config config)
+void enet_loop(ENetHost* client, int timeout, s_config config)
 {
 	ENetEvent event = zero;
 	while(enet_host_service(client, &event, timeout) > 0)
@@ -747,13 +747,15 @@ func void enet_loop(ENetHost* client, int timeout, s_config config)
 				parse_packet(event, config);
 				enet_packet_destroy(event.packet);
 			} break;
-
-			invalid_default_case;
+			default:
+			{
+				log("unknown ENET_EVENT-Type: %d", event.type);
+			}
 		}
 	}
 }
 
-func void revive_every_player(void)
+void revive_every_player(void)
 {
 	for(int i = 0; i < c_max_entities; i++)
 	{
@@ -764,7 +766,7 @@ func void revive_every_player(void)
 	}
 }
 
-func void collision_system(int start, int count)
+void collision_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -791,7 +793,7 @@ func void collision_system(int start, int count)
 	}
 }
 
-func s_font load_font(const char* path, float font_size, s_lin_arena* arena)
+s_font load_font(const char* path, float font_size, s_lin_arena* arena)
 {
 	s_font font = zero;
 	font.size = font_size;
@@ -816,7 +818,7 @@ func s_font load_font(const char* path, float font_size, s_lin_arena* arena)
 		s_glyph glyph = zero;
 		u8* bitmap = stbtt_GetCodepointBitmap(&info, 0, font.scale, char_i, &glyph.width, &glyph.height, 0, 0);
 		stbtt_GetCodepointBox(&info, char_i, &glyph.x0, &glyph.y0, &glyph.x1, &glyph.y1);
-		stbtt_GetGlyphHMetrics(&info, char_i, &glyph.advance_width, null);
+		stbtt_GetGlyphHMetrics(&info, char_i, &glyph.advance_width, nullptr);
 
 		total_width += glyph.width + padding;
 		total_height = max(glyph.height + padding * 2, total_height);
@@ -865,7 +867,7 @@ func s_font load_font(const char* path, float font_size, s_lin_arena* arena)
 
 	for(int bitmap_i = 0; bitmap_i < bitmap_count; bitmap_i++)
 	{
-		stbtt_FreeBitmap(bitmap_arr[bitmap_i], null);
+		stbtt_FreeBitmap(bitmap_arr[bitmap_i], nullptr);
 	}
 
 	free(gl_bitmap);
@@ -875,7 +877,7 @@ func s_font load_font(const char* path, float font_size, s_lin_arena* arena)
 	return font;
 }
 
-func s_texture load_texture_from_data(void* data, int width, int height, u32 filtering)
+s_texture load_texture_from_data(void* data, int width, int height, u32 filtering)
 {
 	assert(data);
 	u32 id;
@@ -893,7 +895,7 @@ func s_texture load_texture_from_data(void* data, int width, int height, u32 fil
 	return texture;
 }
 
-func s_v2 get_text_size_with_count(const char* text, e_font font_id, int count)
+s_v2 get_text_size_with_count(const char* text, e_font font_id, int count)
 {
 	assert(count >= 0);
 	if(count <= 0) { return zero; }
@@ -919,12 +921,12 @@ func s_v2 get_text_size_with_count(const char* text, e_font font_id, int count)
 	return size;
 }
 
-func s_v2 get_text_size(const char* text, e_font font_id)
+s_v2 get_text_size(const char* text, e_font font_id)
 {
 	return get_text_size_with_count(text, font_id, (int)strlen(text));
 }
 
-func void connect_to_server(s_config config)
+void connect_to_server(s_config config)
 {
 	if(enet_initialize() != 0)
 	{
@@ -932,14 +934,14 @@ func void connect_to_server(s_config config)
 	}
 
 	g_client = enet_host_create(
-		null /* create a client host */,
+		nullptr /* create a client host */,
 		1, /* only allow 1 outgoing connection */
 		2, /* allow up 2 channels to be used, 0 and 1 */
 		0, /* assume any amount of incoming bandwidth */
 		0 /* assume any amount of outgoing bandwidth */
 	);
 
-	if(g_client == null)
+	if(!g_client)
 	{
 		error(false);
 	}
@@ -950,7 +952,7 @@ func void connect_to_server(s_config config)
 	address.port = (u16)config.port;
 
 	server = enet_host_connect(g_client, &address, 2, 0);
-	if(server == null)
+	if(!server)
 	{
 		error(false);
 	}
@@ -961,8 +963,8 @@ func void connect_to_server(s_config config)
 
 #ifdef _WIN32
 #ifdef m_debug
-global FILETIME last_write_time = zero;
-func void hot_reload_shaders(void)
+FILETIME last_write_time = zero;
+void hot_reload_shaders(void)
 {
 	WIN32_FIND_DATAA find_data = zero;
 	HANDLE handle = FindFirstFileA("shaders/fragment.fragment", &find_data);
@@ -990,7 +992,7 @@ func void hot_reload_shaders(void)
 #endif // m_debug
 #endif // _WIN32
 
-func u32 load_shader(const char* vertex_path, const char* fragment_path)
+u32 load_shader(const char* vertex_path, const char* fragment_path)
 {
 	u32 vertex = glCreateShader(GL_VERTEX_SHADER);
 	u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -1001,8 +1003,8 @@ func u32 load_shader(const char* vertex_path, const char* fragment_path)
 	if(!fragment_src || !fragment_src[0]) { return 0; }
 	const char* vertex_src_arr[] = {header, read_file("src/shader_shared.h", &frame_arena), vertex_src};
 	const char* fragment_src_arr[] = {header, read_file("src/shader_shared.h", &frame_arena), fragment_src};
-	glShaderSource(vertex, array_count(vertex_src_arr), vertex_src_arr, null);
-	glShaderSource(fragment, array_count(fragment_src_arr), fragment_src_arr, null);
+	glShaderSource(vertex, array_count(vertex_src_arr), vertex_src_arr, nullptr);
+	glShaderSource(fragment, array_count(fragment_src_arr), fragment_src_arr, nullptr);
 	glCompileShader(vertex);
 	char buffer[1024] = zero;
 	check_for_shader_errors(vertex, buffer);
@@ -1017,14 +1019,14 @@ func u32 load_shader(const char* vertex_path, const char* fragment_path)
 	return program;
 }
 
-func void handle_instant_movement_(int entity)
+void handle_instant_movement_(int entity)
 {
 	assert(entity != c_invalid_entity);
 	e.prev_x[entity] = e.x[entity];
 	e.prev_y[entity] = e.y[entity];
 }
 
-func s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
+s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
 {
 	s_config config = zero;
 
@@ -1106,7 +1108,7 @@ func s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
 				{
 					char buffer[32] = zero;
 					memcpy(buffer, start, cursor - start);
-					int val = (int)strtol(buffer, null, 16);
+					int val = (int)strtol(buffer, nullptr, 16);
 					s_v4* color = (s_v4*)query.target;
 					float r = ((val & 0xFF0000) >> 16) / 255.0f;
 					float g = ((val & 0x00FF00) >> 8) / 255.0f;
@@ -1125,7 +1127,7 @@ func s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
 	return config;
 }
 
-func s_config make_default_config(s_rng* in_rng)
+s_config make_default_config(s_rng* in_rng)
 {
 	s_config config = zero;
 	config.ip = make_name("at-taxation.at.ply.gg");
@@ -1137,7 +1139,7 @@ func s_config make_default_config(s_rng* in_rng)
 	return config;
 }
 
-func void save_config(s_config config)
+void save_config(s_config config)
 {
 	s_str_builder builder = zero;
 	builder_add_line(&builder, "name=%s", config.player_name.data);
@@ -1155,7 +1157,7 @@ func void save_config(s_config config)
 	}
 }
 
-func s_name make_name(const char* str)
+s_name make_name(const char* str)
 {
 	s_name result = zero;
 	int len = (int)strlen(str);
@@ -1165,31 +1167,31 @@ func s_name make_name(const char* str)
 	return result;
 }
 
-func b8 is_key_down(int key)
+b8 is_key_down(int key)
 {
 	assert(key < c_max_keys);
 	return g_input->keys[key].is_down || g_input->keys[key].count >= 2;
 }
 
-func b8 is_key_up(int key)
+b8 is_key_up(int key)
 {
 	assert(key < c_max_keys);
 	return !g_input->keys[key].is_down;
 }
 
-func b8 is_key_pressed(int key)
+b8 is_key_pressed(int key)
 {
 	assert(key < c_max_keys);
 	return (g_input->keys[key].is_down && g_input->keys[key].count == 1) || g_input->keys[key].count > 1;
 }
 
-func b8 is_key_released(int key)
+b8 is_key_released(int key)
 {
 	assert(key < c_max_keys);
 	return (!g_input->keys[key].is_down && g_input->keys[key].count == 1) || g_input->keys[key].count > 1;
 }
 
-func s_char_event get_char_event()
+s_char_event get_char_event()
 {
 	s_char_event event = zero;
 	if(char_event_arr->count > 0)

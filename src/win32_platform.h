@@ -48,12 +48,12 @@ struct s_voice : IXAudio2VoiceCallback
 
 
 
-func void create_window(int width, int height);
-func WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam);
-func PROC load_gl_func( const char* name);
-func bool init_audio();
-func b8 thread_safe_set_bool_to_true(volatile int* var);
-func b8 play_sound(s_sound sound);
-func void init_performance();
-func f64 get_seconds();
-func void do_gamepad_shit(void);
+void create_window(int width, int height);
+WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam);
+PROC load_gl_func( const char* name);
+bool init_audio();
+b8 thread_safe_set_bool_to_true(volatile int* var);
+b8 play_sound(s_sound sound);
+void init_performance();
+f64 get_seconds();
+void do_gamepad_shit(void);

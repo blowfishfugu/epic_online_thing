@@ -1,3 +1,5 @@
+#pragma once
+#include "types.h"
 
 #pragma pack(push, 1)
 struct s_riff_chunk
@@ -26,4 +28,11 @@ struct s_data_chunk
 };
 #pragma pack(pop)
 
-func b8 play_sound_if_supported(s_sound sound);
+struct s_sound
+{
+	int sample_count;
+	s16* samples;
+};
+
+
+b8 play_sound_if_supported(s_sound sound);

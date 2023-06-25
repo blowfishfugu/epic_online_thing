@@ -1,5 +1,5 @@
 
-func s_sound load_wav(const char* path, s_lin_arena* arena)
+s_sound load_wav(const char* path, s_lin_arena* arena)
 {
 
 	s_sound result = zero;
@@ -23,7 +23,7 @@ func s_sound load_wav(const char* path, s_lin_arena* arena)
 	return result;
 }
 
-func b8 play_sound_if_supported(s_sound sound)
+b8 play_sound_if_supported(s_sound sound)
 {
 	if(!g_platform_funcs.play_sound) { return false; }
 	return g_platform_funcs.play_sound(sound);

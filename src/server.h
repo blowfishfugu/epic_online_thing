@@ -5,6 +5,6 @@ struct s_game
 };
 
 
-func void update(void);
-func void parse_packet(ENetEvent event);
-func void revive_every_player(void);
+void update(void);
+void parse_packet(ENetEvent event);
+void revive_every_player(void);

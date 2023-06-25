@@ -1,8 +1,8 @@
 
-// func s_read_file_result read_file(char* path, s_lin_arena* arena)
+// s_read_file_result read_file(char* path, s_lin_arena* arena)
 // {
 // 	s_read_file_result result = zero;
-// 	result.file = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, null);
+// 	result.file = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, null);
 // 	if(result.file == INVALID_HANDLE_VALUE) { return result; }
 
 // 	result.file_size = GetFileSize(result.file, null);
@@ -22,7 +22,7 @@
 // }
 
 
-// func char* read_file_quick(char* path, s_lin_arena* arena)
+// char* read_file_quick(char* path, s_lin_arena* arena)
 // {
 // 	s_read_file_result result = read_file(path, arena);
 // 	if(result.file != INVALID_HANDLE_VALUE) { CloseHandle(result.file); }
@@ -30,10 +30,10 @@
 // }
 
 
-func char* read_file(const char* path, s_lin_arena* arena)
+char* read_file(const char* path, s_lin_arena* arena)
 {
 	FILE* file = fopen(path, "rb");
-	if(!file) { return null; }
+	if(!file) { return nullptr; }
 
 	fseek(file, 0, SEEK_END);
 	size_t file_size = ftell(file);
@@ -46,7 +46,7 @@ func char* read_file(const char* path, s_lin_arena* arena)
 	return data;
 }
 
-func b8 write_file(const char* path, void* data, size_t size)
+b8 write_file(const char* path, void* data, size_t size)
 {
 	assert(size > 0);
 	FILE* file = fopen(path, "wb");

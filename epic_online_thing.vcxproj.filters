@@ -45,7 +45,13 @@
     <ClCompile Include="src\platform_shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HybridGPU.cpp">
+    <ClCompile Include="src\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HybridGPU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

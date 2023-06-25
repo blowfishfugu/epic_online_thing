@@ -1,6 +1,6 @@
 
 
-func void builder_add_(s_str_builder* builder, const char* what, b8 use_tabs, va_list args)
+void builder_add_(s_str_builder* builder, const char* what, b8 use_tabs, va_list args)
 {
 	if(use_tabs)
 	{
@@ -17,7 +17,7 @@ func void builder_add_(s_str_builder* builder, const char* what, b8 use_tabs, va
 	builder->data[builder->len] = 0;
 }
 
-func void builder_add(s_str_builder* builder, const char* what, ...)
+void builder_add(s_str_builder* builder, const char* what, ...)
 {
 	va_list args;
 	va_start(args, what);
@@ -25,14 +25,14 @@ func void builder_add(s_str_builder* builder, const char* what, ...)
 	va_end(args);
 }
 
-func void builder_add_char(s_str_builder* builder, char c)
+void builder_add_char(s_str_builder* builder, char c)
 {
 	assert(builder->len < c_str_builder_size);
 	builder->data[builder->len++] = c;
 	builder->data[builder->len] = 0;
 }
 
-func void builder_add_with_tabs(s_str_builder* builder, char* what, ...)
+void builder_add_with_tabs(s_str_builder* builder, char* what, ...)
 {
 	va_list args;
 	va_start(args, what);
@@ -40,7 +40,7 @@ func void builder_add_with_tabs(s_str_builder* builder, char* what, ...)
 	va_end(args);
 }
 
-func void builder_add_line(s_str_builder* builder, const char* what, ...)
+void builder_add_line(s_str_builder* builder, const char* what, ...)
 {
 	va_list args;
 	va_start(args, what);
@@ -49,7 +49,7 @@ func void builder_add_line(s_str_builder* builder, const char* what, ...)
 	builder_add(builder, "\n");
 }
 
-func void builder_add_line_with_tabs(s_str_builder* builder, const char* what, ...)
+void builder_add_line_with_tabs(s_str_builder* builder, const char* what, ...)
 {
 	va_list args;
 	va_start(args, what);
@@ -58,7 +58,7 @@ func void builder_add_line_with_tabs(s_str_builder* builder, const char* what, .
 	builder_add(builder, "\n");
 }
 
-func void builder_add_tabs(s_str_builder* builder)
+void builder_add_tabs(s_str_builder* builder)
 {
 	for(int tab_i = 0; tab_i < builder->tab_count; tab_i++)
 	{
@@ -66,18 +66,18 @@ func void builder_add_tabs(s_str_builder* builder)
 	}
 }
 
-func void builder_line(s_str_builder* builder)
+void builder_line(s_str_builder* builder)
 {
 	builder_add(builder, "\n");
 }
 
-func void builder_push_tab(s_str_builder* builder)
+void builder_push_tab(s_str_builder* builder)
 {
 	assert(builder->tab_count <= 64);
 	builder->tab_count++;
 }
 
-func void builder_pop_tab(s_str_builder* builder)
+void builder_pop_tab(s_str_builder* builder)
 {
 	assert(builder->tab_count > 0);
 	builder->tab_count--;

@@ -67,37 +67,37 @@ struct s_game
 
 
 
-func void update(s_config config);
-func void render(float dt);
-func b8 check_for_shader_errors(u32 id, char* out_error);
-func void input_system(int start, int count);
-func void draw_system(int start, int count, float dt);
-func void parse_packet(ENetEvent event, s_config config);
-func void enet_loop(ENetHost* client, int timeout, s_config config);
-func void revive_every_player(void);
-func void draw_circle_system(int start, int count, float dt);
-func void collision_system(int start, int count);
-func s_font load_font(const char* path, float font_size, s_lin_arena* arena);
-func s_texture load_texture_from_data(void* data, int width, int height, u32 filtering);
-func s_v2 get_text_size(const char* text, e_font font_id);
-func s_v2 get_text_size_with_count(char* text, e_font font_id, int count);
-func void connect_to_server(s_config config);
-func u32 load_shader(const char* vertex_path, const char* fragment_path);
-func void handle_instant_movement_(int entity);
-func s_config make_default_config(s_rng* in_rng);
-func s_name make_name(const char* str);
-func void save_config(s_config config);
-func s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng);
-func b8 is_key_down(int key);
-func b8 is_key_up(int key);
-func b8 is_key_pressed(int key);
-func b8 is_key_released(int key);
-func s_char_event get_char_event();
+void update(s_config config);
+void render(float dt);
+b8 check_for_shader_errors(u32 id, char* out_error);
+void input_system(int start, int count);
+void draw_system(int start, int count, float dt);
+void parse_packet(ENetEvent event, s_config config);
+void enet_loop(ENetHost* client, int timeout, s_config config);
+void revive_every_player(void);
+void draw_circle_system(int start, int count, float dt);
+void collision_system(int start, int count);
+s_font load_font(const char* path, float font_size, s_lin_arena* arena);
+s_texture load_texture_from_data(void* data, int width, int height, u32 filtering);
+s_v2 get_text_size(const char* text, e_font font_id);
+s_v2 get_text_size_with_count(char* text, e_font font_id, int count);
+void connect_to_server(s_config config);
+u32 load_shader(const char* vertex_path, const char* fragment_path);
+void handle_instant_movement_(int entity);
+s_config make_default_config(s_rng* in_rng);
+s_name make_name(const char* str);
+void save_config(s_config config);
+s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng);
+b8 is_key_down(int key);
+b8 is_key_up(int key);
+b8 is_key_pressed(int key);
+b8 is_key_released(int key);
+s_char_event get_char_event();
 void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 #ifdef _WIN32
 #ifdef m_debug
-func void hot_reload_shaders(void);
+void hot_reload_shaders(void);
 #endif // m_debug
 #endif // _WIN32
 

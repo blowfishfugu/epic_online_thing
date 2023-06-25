@@ -1,9 +1,9 @@
 
-global float spawn_timer[e_projectile_type_count];
-global int current_level;
-global float level_timer;
+float spawn_timer[e_projectile_type_count];
+int current_level;
+float level_timer;
 
-func void player_movement_system(int start, int count)
+void player_movement_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -18,7 +18,7 @@ func void player_movement_system(int start, int count)
 	}
 }
 
-func void move_system(int start, int count)
+void move_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -31,7 +31,7 @@ func void move_system(int start, int count)
 	}
 }
 
-func void physics_movement_system(int start, int count)
+void physics_movement_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -44,7 +44,7 @@ func void physics_movement_system(int start, int count)
 	}
 }
 
-func int make_entity(void)
+int make_entity(void)
 {
 	for(int i = 0; i < c_max_entities; i++)
 	{
@@ -60,7 +60,7 @@ func int make_entity(void)
 	return c_invalid_entity;
 }
 
-func void zero_entity(int index)
+void zero_entity(int index)
 {
 	assert(index < c_max_entities);
 	memset(e.flags[index], 0, sizeof(e.flags[index]));
@@ -86,7 +86,7 @@ func void zero_entity(int index)
 	e.drawn_last_render[index] = false;
 }
 
-func int find_player_by_id(u32 id)
+int find_player_by_id(u32 id)
 {
 	if(id == 0) { return c_invalid_entity; }
 
@@ -98,7 +98,7 @@ func int find_player_by_id(u32 id)
 	return c_invalid_entity;
 }
 
-func void gravity_system(int start, int count)
+void gravity_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -110,7 +110,7 @@ func void gravity_system(int start, int count)
 	}
 }
 
-func void player_bounds_check_system(int start, int count)
+void player_bounds_check_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -133,7 +133,7 @@ func void player_bounds_check_system(int start, int count)
 	}
 }
 
-func void projectile_bounds_check_system(int start, int count)
+void projectile_bounds_check_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -155,7 +155,7 @@ func void projectile_bounds_check_system(int start, int count)
 }
 
 
-func int make_player(u32 player_id, b8 dead, s_v4 color)
+int make_player(u32 player_id, b8 dead, s_v4 color)
 {
 	int entity = make_entity();
 	e.x[entity] = c_spawn_pos.x;
@@ -185,7 +185,7 @@ func int make_player(u32 player_id, b8 dead, s_v4 color)
 	return entity;
 }
 
-func int make_projectile(void)
+int make_projectile(void)
 {
 	int entity = make_entity();
 	assert(entity != c_invalid_entity);
@@ -200,7 +200,7 @@ func int make_projectile(void)
 }
 
 
-func void spawn_system(s_level level)
+void spawn_system(s_level level)
 {
 
 	for(int proj_i = 0; proj_i < e_projectile_type_count; proj_i++)
@@ -355,14 +355,16 @@ func void spawn_system(s_level level)
 					e.speed[entity] *= level.speed_multiplier[proj_i];
 					handle_instant_movement(entity);
 				} break;
-
-				invalid_default_case;
+				default:
+				{
+					log("unkown projectile type: %d", proj_i);
+				}
 			}
 		}
 	}
 }
 
-func void init_levels(void)
+void init_levels(void)
 {
 	#define speed(val) (1000.0f / val)
 
@@ -437,7 +439,7 @@ func void init_levels(void)
 	#undef speed
 }
 
-func void reset_level(void)
+void reset_level(void)
 {
 	level_timer = 0;
 	memset(spawn_timer, 0, sizeof(spawn_timer));
@@ -467,7 +469,7 @@ func void reset_level(void)
 	}
 }
 
-func void expire_system(int start, int count)
+void expire_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -483,7 +485,7 @@ func void expire_system(int start, int count)
 	}
 }
 
-func void make_diagonal_bottom_projectile(int entity, float x, float angle)
+void make_diagonal_bottom_projectile(int entity, float x, float angle)
 {
 	e.x[entity] = x;
 	e.y[entity] = c_base_res.y;
@@ -497,7 +499,7 @@ func void make_diagonal_bottom_projectile(int entity, float x, float angle)
 	e.flags[entity][e_entity_flag_gravity] = true;
 }
 
-func void make_diagonal_top_projectile(int entity, float x, float opposite_x)
+void make_diagonal_top_projectile(int entity, float x, float opposite_x)
 {
 	s_v2 pos = v2(x, 0.0f);
 	e.x[entity] = pos.x;
@@ -513,7 +515,7 @@ func void make_diagonal_top_projectile(int entity, float x, float opposite_x)
 	e.color[entity] = v4(0.9f, 0.9f, 0.1f, 1.0f);
 }
 
-func void projectile_spawner_system(int start, int count)
+void projectile_spawner_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{
@@ -630,14 +632,17 @@ func void projectile_spawner_system(int start, int count)
 					e.color[entity] = e.color[ii];
 					handle_instant_movement(entity);
 				} break;
-
-				invalid_default_case;
+				default:
+				{
+					log("unknown spawner-type: %d", e.particle_spawner[ii].type);
+				}
+				
 			}
 		}
 	}
 }
 
-func void make_side_projectile(int entity, float x, float x_dir)
+void make_side_projectile(int entity, float x, float x_dir)
 {
 	e.x[entity] = x;
 	e.y[entity] = randf_range(&rng, c_base_res.y * 0.6f, c_base_res.y);
@@ -647,7 +652,7 @@ func void make_side_projectile(int entity, float x, float x_dir)
 	e.color[entity] = v4(0.1f, 0.9f, 0.1f, 1.0f);
 }
 
-func void send_packet_(ENetPeer* peer, e_packet packet_id, void* data, size_t size, int flag)
+void send_packet_(ENetPeer* peer, e_packet packet_id, void* data, size_t size, int flag)
 {
 	assert(flag == 0 || flag == ENET_PACKET_FLAG_RELIABLE);
 	assert(size <= 1024 - sizeof(packet_id));
@@ -660,7 +665,7 @@ func void send_packet_(ENetPeer* peer, e_packet packet_id, void* data, size_t si
 	enet_peer_send(peer, 0, packet);
 }
 
-func void broadcast_packet_(ENetHost* in_host, e_packet packet_id, void* data, size_t size, int flag)
+void broadcast_packet_(ENetHost* in_host, e_packet packet_id, void* data, size_t size, int flag)
 {
 	assert(flag == 0 || flag == ENET_PACKET_FLAG_RELIABLE);
 	assert(size <= 1024 - sizeof(packet_id));
@@ -673,7 +678,7 @@ func void broadcast_packet_(ENetHost* in_host, e_packet packet_id, void* data, s
 	enet_host_broadcast(in_host, 0, packet);
 }
 
-func s_name str_to_name(char* str)
+s_name str_to_name(char* str)
 {
 	s_name result = zero;
 	result.len = (int)strlen(str);
@@ -682,7 +687,7 @@ func s_name str_to_name(char* str)
 	return result;
 }
 
-func void send_simple_packet(ENetPeer* peer, e_packet packet_id, int flag)
+void send_simple_packet(ENetPeer* peer, e_packet packet_id, int flag)
 {
 	assert(flag == 0 || flag == ENET_PACKET_FLAG_RELIABLE);
 
@@ -693,7 +698,7 @@ func void send_simple_packet(ENetPeer* peer, e_packet packet_id, int flag)
 	enet_peer_send(peer, 0, packet);
 }
 
-func void broadcast_simple_packet(ENetHost* in_host, e_packet packet_id, int flag)
+void broadcast_simple_packet(ENetHost* in_host, e_packet packet_id, int flag)
 {
 	assert(flag == 0 || flag == ENET_PACKET_FLAG_RELIABLE);
 
@@ -704,7 +709,7 @@ func void broadcast_simple_packet(ENetHost* in_host, e_packet packet_id, int fla
 	enet_host_broadcast(in_host, 0, packet);
 }
 
-func void increase_time_lived_system(int start, int count)
+void increase_time_lived_system(int start, int count)
 {
 	for(int i = 0; i < count; i++)
 	{

@@ -17,14 +17,14 @@
 #include "platform_shared.h"
 #include "win32_platform.h"
 
-global s_window g_window;
-global s_input g_win32input;
-global s_voice voice_arr[c_max_concurrent_sounds];
-global u64 g_cycle_frequency;
-global u64 g_start_cycles;
-global s_gamepad g_gamepads[XUSER_MAX_COUNT];
+s_window g_window;
+s_input g_win32input;
+s_voice voice_arr[c_max_concurrent_sounds];
+u64 g_cycle_frequency;
+u64 g_start_cycles;
+s_gamepad g_gamepads[XUSER_MAX_COUNT];
 
-global s_sarray<s_char_event, 1024> win32char_event_arr;
+s_sarray<s_char_event, 1024> win32char_event_arr;
 
 #include "platform_shared.cpp"
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		f64 start_of_frame_seconds = get_seconds();
 
 		MSG msg = zero;
-		while(PeekMessage(&msg, null, 0, 0, PM_REMOVE) > 0)
+		while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) > 0)
 		{
 			if(msg.message == WM_QUIT)
 			{
@@ -140,13 +140,13 @@ LRESULT window_proc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
 	return result;
 }
 
-func void create_window(int width, int height)
+void create_window(int width, int height)
 {
 	const char* class_name = "epic_online_thing_class";
-	HINSTANCE instance = GetModuleHandle(null);
+	HINSTANCE instance = GetModuleHandle(nullptr);
 
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = null;
-	PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = null;
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
+	PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
 
 	// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv		dummy start		vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 	{
@@ -164,10 +164,10 @@ func void create_window(int width, int height)
 			"dummy",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			null,
-			null,
+			nullptr,
+			nullptr,
 			instance,
-			null
+			nullptr
 		);
 		assert(dummy_window != INVALID_HANDLE_VALUE);
 
@@ -190,7 +190,7 @@ func void create_window(int width, int height)
 		wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)load_gl_func("wglCreateContextAttribsARB");
 		wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)load_gl_func("wglChoosePixelFormatARB");
 
-		check(wglMakeCurrent(null, null));
+		check(wglMakeCurrent(nullptr, nullptr));
 		check(wglDeleteContext(glrc));
 		check(ReleaseDC(dummy_window, dc));
 		check(DestroyWindow(dummy_window));
@@ -207,7 +207,7 @@ func void create_window(int width, int height)
 		window_class.lpfnWndProc = window_proc;
 		window_class.lpszClassName = class_name;
 		window_class.hInstance = instance;
-		window_class.hCursor = LoadCursor(null, IDC_ARROW);
+		window_class.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		check(RegisterClassEx(&window_class));
 
 		DWORD style = (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX;
@@ -222,10 +222,10 @@ func void create_window(int width, int height)
 			"Epic Online Thing",
 			style,
 			CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top,
-			null,
-			null,
+			nullptr,
+			nullptr,
 			instance,
-			null
+			nullptr
 		);
 		assert(g_window.handle != INVALID_HANDLE_VALUE);
 
@@ -250,7 +250,7 @@ func void create_window(int width, int height)
 		pfd.nSize = sizeof(pfd);
 		int format;
 		u32 num_formats;
-		check(wglChoosePixelFormatARB(g_window.dc, pixel_attribs, null, 1, &format, &num_formats));
+		check(wglChoosePixelFormatARB(g_window.dc, pixel_attribs, nullptr, 1, &format, &num_formats));
 		check(DescribePixelFormat(g_window.dc, format, sizeof(pfd), &pfd));
 		SetPixelFormat(g_window.dc, format, &pfd);
 
@@ -261,13 +261,13 @@ func void create_window(int width, int height)
 			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 			0
 		};
-		HGLRC glrc = wglCreateContextAttribsARB(g_window.dc, null, gl_attribs);
+		HGLRC glrc = wglCreateContextAttribsARB(g_window.dc, nullptr, gl_attribs);
 		check(wglMakeCurrent(g_window.dc, glrc));
 	}
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^		window end		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 
-func PROC load_gl_func(const char* name)
+PROC load_gl_func(const char* name)
 {
 	PROC result = wglGetProcAddress(name);
 	if(!result)
@@ -279,7 +279,7 @@ func PROC load_gl_func(const char* name)
 }
 
 // @Note(tkap, 16/05/2023): https://stackoverflow.com/a/15977613
-func WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam)
+WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam)
 {
 	WPARAM new_vk = vk;
 	UINT scancode = (lparam & 0x00ff0000) >> 16;
@@ -311,16 +311,16 @@ func WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam)
 	return new_vk;
 }
 
-func bool init_audio()
+bool init_audio()
 {
-	HRESULT hr = CoInitializeEx(null, COINIT_MULTITHREADED);
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hr)) { return false; }
 
-	IXAudio2* xaudio2 = null;
+	IXAudio2* xaudio2 = nullptr;
 	hr = XAudio2Create(&xaudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	if(FAILED(hr)) { return false; }
 
-	IXAudio2MasteringVoice* master_voice = null;
+	IXAudio2MasteringVoice* master_voice = nullptr;
 	hr = xaudio2->CreateMasteringVoice(&master_voice);
 	if(FAILED(hr)) { return false; }
 
@@ -335,7 +335,7 @@ func bool init_audio()
 	for(int voice_i = 0; voice_i < c_max_concurrent_sounds; voice_i++)
 	{
 		s_voice* voice = &voice_arr[voice_i];
-		hr = xaudio2->CreateSourceVoice(&voice->voice, &wave, 0, XAUDIO2_DEFAULT_FREQ_RATIO, voice, null, null);
+		hr = xaudio2->CreateSourceVoice(&voice->voice, &wave, 0, XAUDIO2_DEFAULT_FREQ_RATIO, voice, nullptr, nullptr);
 		voice->voice->SetVolume(0.25f);
 		if(FAILED(hr)) { return false; }
 	}
@@ -344,7 +344,7 @@ func bool init_audio()
 
 }
 
-func b8 play_sound(s_sound sound)
+b8 play_sound(s_sound sound)
 {
 	assert(sound.sample_count > 0);
 	assert(sound.samples);
@@ -354,7 +354,7 @@ func b8 play_sound(s_sound sound)
 	buffer.AudioBytes = sound.sample_count * c_num_channels * sizeof(s16);
 	buffer.pAudioData = (BYTE*)sound.samples;
 
-	s_voice* curr_voice = null;
+	s_voice* curr_voice = nullptr;
 	for(int voice_i = 0; voice_i < c_max_concurrent_sounds; voice_i++)
 	{
 		s_voice* voice = &voice_arr[voice_i];
@@ -368,7 +368,7 @@ func b8 play_sound(s_sound sound)
 		}
 	}
 
-	if(curr_voice == null) { return false; }
+	if(curr_voice == nullptr) { return false; }
 	if (curr_voice->voice)
 	{
 		HRESULT hr = curr_voice->voice->SubmitSourceBuffer(&buffer);
@@ -380,7 +380,7 @@ func b8 play_sound(s_sound sound)
 	return true;
 }
 
-func b8 thread_safe_set_bool_to_true(volatile int* var)
+b8 thread_safe_set_bool_to_true(volatile int* var)
 {
 	int belief = *var;
 	if(!belief)
@@ -391,13 +391,13 @@ func b8 thread_safe_set_bool_to_true(volatile int* var)
 	return false;
 }
 
-func void init_performance()
+void init_performance()
 {
 	QueryPerformanceFrequency((LARGE_INTEGER*)&g_cycle_frequency);
 	QueryPerformanceCounter((LARGE_INTEGER*)&g_start_cycles);
 }
 
-func f64 get_seconds()
+f64 get_seconds()
 {
 	u64 now;
 	QueryPerformanceCounter((LARGE_INTEGER*)&now);
@@ -409,7 +409,7 @@ func f64 get_seconds()
 #include <Xinput.h>
 #endif
 
-func void do_gamepad_shit(void)
+void do_gamepad_shit(void)
 {
 #ifdef USE_GAMEPAD_SHIT
 	int buttons[] = {

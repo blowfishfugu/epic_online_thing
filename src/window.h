@@ -14,8 +14,8 @@ struct s_window
 
 LRESULT window_proc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam);
 void gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
-func WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam);
-func void apply_event_to_input(s_input* in_input, s_stored_input event);
+WPARAM remap_key_if_necessary(WPARAM vk, LPARAM lparam);
+void apply_event_to_input(s_input* in_input, s_stored_input event);
 
 #define m_gl_funcs \
 X(PFNGLBUFFERDATAPROC, glBufferData) \

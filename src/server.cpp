@@ -18,14 +18,14 @@
 
 #define c_max_peers 32
 
-global s_sarray<ENetPeer*, c_max_peers> peers;
-global s_lin_arena frame_arena;
-global s_entities e;
-global u32 peer_ids[c_max_peers];
-global ENetHost* host;
-global s_rng rng;
-global int level_count = 0;
-global s_game game;
+s_sarray<ENetPeer*, c_max_peers> peers;
+s_lin_arena frame_arena;
+s_entities e;
+u32 peer_ids[c_max_peers];
+ENetHost* host;
+s_rng rng;
+int level_count = 0;
+s_game game;
 
 #include "shared.cpp"
 #include "memory.cpp"
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		0 /* assume any amount of outgoing bandwidth */
 	);
 
-	if(host == null)
+	if(!host)
 	{
 		error(false);
 	}
@@ -174,8 +174,10 @@ int main(int argc, char** argv)
 					parse_packet(event);
 					enet_packet_destroy(event.packet);
 				} break;
-
-				invalid_default_case;
+				default:
+				{
+					log("unknown ENET_EVENT-Type: %d", event.type);
+				}
 			}
 		}
 
@@ -197,7 +199,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-func void update(void)
+void update(void)
 {
 	for(int i = 0; i < c_num_threads; i++)
 	{
@@ -285,7 +287,7 @@ func void update(void)
 	}
 }
 
-func void parse_packet(ENetEvent event)
+void parse_packet(ENetEvent event)
 {
 	u8* cursor = event.packet->data;
 	e_packet packet_id = *(e_packet*)buffer_read(&cursor, sizeof(packet_id));
@@ -409,7 +411,7 @@ func void parse_packet(ENetEvent event)
 	}
 }
 
-func void revive_every_player(void)
+void revive_every_player(void)
 {
 	for(int peer_i = 0; peer_i < peers.count; peer_i++)
 	{
