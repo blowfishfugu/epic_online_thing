@@ -947,9 +947,10 @@ void connect_to_server(s_config config)
 	}
 
 	ENetAddress address = zero;
-	enet_address_set_host(&address, config.ip.data);
-	// enet_address_set_host(&address, "127.0.0.1");
-	address.port = (u16)config.port;
+	//enet_address_set_host(&address, config.ip.data);
+	//address.port = (u16)config.port;
+	enet_address_set_host(&address, "127.0.0.1");
+	address.port = (u16)c_port;
 
 	server = enet_host_connect(g_client, &address, 2, 0);
 	if(!server)

@@ -118,5 +118,6 @@
     <None Include="shaders\vertex.vertex">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

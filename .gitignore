@@ -51,11 +51,13 @@ dkms.conf
 stamp_timer.data
 build/**
 
+#msvc buildoutputs, packages
 .vs
 **/Debug
 **/Release
 /bin
 /tmp
+/packages
 
 build
 .tags

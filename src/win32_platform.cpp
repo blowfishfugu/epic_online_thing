@@ -6,7 +6,7 @@
 #include "external/glcorearb.h"
 #include "external/wglext.h"
 #include <xinput.h>
-#include <xaudio2.h>
+#include <xaudio2Redist.h>
 #include <stdio.h>
 #include <math.h>
 
