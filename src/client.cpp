@@ -75,7 +75,7 @@ m_gl_funcs
 #endif // _WIN32
 
 #include "draw.cpp"
-#include "memory.cpp"
+//#include "memory.cpp"
 #include "file.cpp"
 #include "shared.cpp"
 #include "str_builder.cpp"

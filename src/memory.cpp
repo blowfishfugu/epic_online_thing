@@ -1,3 +1,7 @@
+#include "memory.h"
+#include "utils.h"
+#include "types.h"
+#include <Windows.h> //virtualAlloc
 
 s_lin_arena make_lin_arena(size_t capacity)
 {

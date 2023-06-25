@@ -95,10 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\math.cpp" />
-    <ClCompile Include="src\memory.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\memory.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shared.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

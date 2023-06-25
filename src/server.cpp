@@ -28,7 +28,7 @@ int level_count = 0;
 s_game game;
 
 #include "shared.cpp"
-#include "memory.cpp"
+//#include "memory.cpp"
 
 
 int main(int argc, char** argv)
