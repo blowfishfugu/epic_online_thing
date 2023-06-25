@@ -18,13 +18,13 @@
 
 #define c_max_peers 32
 
-make_list(s_peer_list, ENetPeer*, c_max_peers)
-global s_peer_list peers;
+global s_sarray<ENetPeer*, c_max_peers> peers;
 global s_lin_arena frame_arena;
 global s_entities e;
 global u32 peer_ids[c_max_peers];
 global ENetHost* host;
 global s_rng rng;
+global int level_count = 0;
 
 #include "shared.cpp"
 #include "memory.cpp"
@@ -97,6 +97,8 @@ int main(int argc, char** argv)
 						data.name = e.name[entity];
 						data.color = e.color[entity];
 						send_packet(event.peer, e_packet_already_connected_player, data, ENET_PACKET_FLAG_RELIABLE);
+						log("Sent already connected data to %u", id);
+						log("Color: %f, %f, %f", data.color.x, data.color.y, data.color.z);
 					}
 
 					// @Note(tkap, 22/06/2023): Welcome the new client
@@ -117,7 +119,7 @@ int main(int argc, char** argv)
 						send_packet(peer, e_packet_another_player_connected, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
-					s_peer_list_add(&peers, event.peer);
+					peers.add(event.peer);
 					peer_ids[peers.count - 1] = event.peer->connectID;
 
 					make_player(event.peer->connectID, true, v41f(1));
@@ -235,7 +237,14 @@ func void update(void)
 
 		log("Level %i beaten", current_level + 1);
 
-		current_level = (current_level+ 1) % c_max_levels;
+		current_level += 1;
+
+		// @Note(tkap, 25/06/2023): Reset if we go past all levels
+		if(current_level >= level_count)
+		{
+			current_level = 0;
+			broadcast_simple_packet(host, e_packet_all_levels_beat, ENET_PACKET_FLAG_RELIABLE);
+		}
 		reset_level();
 		revive_every_player();
 	}
@@ -323,6 +332,7 @@ func void parse_packet(ENetEvent event)
 			if(entity != c_invalid_entity)
 			{
 				e.name[entity] = data.name;
+				e.color[entity] = data.color;
 				log("Set %u's name to %s", player_id, e.name[entity].data);
 
 				// @Note(tkap, 23/06/2023): Send the name to everyone else
@@ -344,7 +354,7 @@ func void parse_packet(ENetEvent event)
 		#ifdef m_debug
 		case e_packet_cheat_next_level:
 		{
-			if(peers.count > 1) { break; }
+			// if(peers.count > 1) { break; }
 
 			s_beat_level_from_server data = zero;
 			data.current_level = current_level % c_max_levels;
@@ -358,7 +368,7 @@ func void parse_packet(ENetEvent event)
 
 		case e_packet_cheat_previous_level:
 		{
-			if(peers.count > 1) { break; }
+			// if(peers.count > 1) { break; }
 			if(current_level <= 0) { break; }
 
 			current_level = (current_level - 1) % c_max_levels;

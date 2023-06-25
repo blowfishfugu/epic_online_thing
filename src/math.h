@@ -1,5 +1,6 @@
-
-#define pi (3.141f)
+#pragma once
+#include <numbers>
+constexpr const float pi=static_cast<float>(std::numbers::pi);
 
 struct s_v2
 {

@@ -1,4 +1,4 @@
-
+#pragma once
 
 global constexpr s_v2 c_base_res = {1366, 768};
 global constexpr s_v2 c_spawn_pos = {c_base_res.x * 0.5f, c_base_res.y * 0.5f};
