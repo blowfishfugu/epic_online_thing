@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
 				case ENET_EVENT_TYPE_CONNECT:
 				{
-					log("Someone connected!");
+					add_log("Someone connected!");
 
 					if(peers.count >= c_max_peers) { break; }
 
@@ -98,8 +98,8 @@ int main(int argc, char** argv)
 						data.name = e.name[entity];
 						data.color = e.color[entity];
 						send_packet(event.peer, e_packet_already_connected_player, data, ENET_PACKET_FLAG_RELIABLE);
-						log("Sent already connected data to %u", id);
-						log("Color: %f, %f, %f", data.color.x, data.color.y, data.color.z);
+						add_log("Sent already connected data to %u", id);
+						add_log("Color: %f, %f, %f", data.color.x, data.color.y, data.color.z);
 					}
 
 					// @Note(tkap, 22/06/2023): Welcome the new client
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 						send_packet(peer, e_packet_player_disconnected, data, ENET_PACKET_FLAG_RELIABLE);
 					}
 
-					log("Someone disconnected!");
+					add_log("Someone disconnected!");
 
 				} break;
 
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 				} break;
 				default:
 				{
-					log("unknown ENET_EVENT-Type: %d", event.type);
+					add_log("unknown ENET_EVENT-Type: %d", event.type);
 				}
 			}
 		}
@@ -242,7 +242,7 @@ void update(void)
 		data.seed = rng.seed;
 		broadcast_packet(host, e_packet_beat_level, data, ENET_PACKET_FLAG_RELIABLE);
 
-		log("Level %i beaten", current_level + 1);
+		add_log("Level %i beaten", current_level + 1);
 
 		current_level += 1;
 
@@ -257,7 +257,7 @@ void update(void)
 	}
 	if(!at_least_one_player_alive)
 	{
-		log("Level %i restarted", current_level + 1);
+		add_log("Level %i restarted", current_level + 1);
 		reset_level();
 		revive_every_player();
 
@@ -359,7 +359,7 @@ void parse_packet(ENetEvent event)
 			{
 				e.name[entity] = data.name;
 				e.color[entity] = data.color;
-				log("Set %u's name to %s", player_id, e.name[entity].data);
+				add_log("Set %u's name to %s", player_id, e.name[entity].data);
 
 				// @Note(tkap, 23/06/2023): Send the name to everyone else
 				for(int peer_i = 0; peer_i < peers.count; peer_i++)

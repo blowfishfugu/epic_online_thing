@@ -14,9 +14,9 @@
 
 
 #ifdef m_server
-#define log(...) printf("Server: "  __VA_ARGS__); printf("\n")
+#define add_log(...) printf("Server: "  __VA_ARGS__); printf("\n")
 #else // m_server
-#define log(...) printf("Client: " __VA_ARGS__); printf("\n")
+#define add_log(...) printf("Client: " __VA_ARGS__); printf("\n")
 #endif
 
 void on_failed_assert(const char* cond, const char* file, int line);

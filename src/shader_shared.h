@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifdef m_app
 	#define shader_v2 alignas(8) s_v2

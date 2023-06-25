@@ -4,14 +4,14 @@
 #ifdef _WIN32
 // @Note(tkap, 24/06/2023): We don't want this Madeg
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <Windows.h>
+#include <winsock2.h>
 #endif // _WIN32
 
 #include <GL/gl.h>
 #include "external/glcorearb.h"
 #include "external/wglext.h"
 
-#include <winsock2.h>
 #include <stdio.h>
 #include <math.h>
 #include "external\enet\enet.h"
@@ -452,7 +452,7 @@ b8 check_for_shader_errors(u32 id, char* out_error)
 	if(!compile_success)
 	{
 		glGetShaderInfoLog(id, 1024, nullptr, info_log);
-		log("Failed to compile shader:\n%s", info_log);
+		add_log("Failed to compile shader:\n%s", info_log);
 
 		if(out_error)
 		{
@@ -596,7 +596,7 @@ void parse_packet(ENetEvent event, s_config config)
 			int entity = make_player(data.id, data.dead, data.color);
 			e.name[entity] = data.name;
 			e.color[entity] = data.color;
-			log("Got already connected data of %u", data.id);
+			add_log("Got already connected data of %u", data.id);
 		} break;
 
 		case e_packet_another_player_connected:
@@ -637,7 +637,7 @@ void parse_packet(ENetEvent event, s_config config)
 			rng.seed = data.seed;
 			reset_level();
 			revive_every_player();
-			log("Beat level %i", current_level);
+			add_log("Beat level %i", current_level);
 			play_sound_if_supported(win_sound);
 		} break;
 
@@ -645,7 +645,7 @@ void parse_packet(ENetEvent event, s_config config)
 		{
 			s_reset_level_from_server data = *(s_reset_level_from_server*)cursor;
 			current_level = data.current_level % c_max_levels;
-			log("Reset level %i", current_level + 1);
+			add_log("Reset level %i", current_level + 1);
 			rng.seed = data.seed;
 			reset_level();
 			revive_every_player();
@@ -658,7 +658,7 @@ void parse_packet(ENetEvent event, s_config config)
 			int entity = find_player_by_id(data.id);
 			if(entity != c_invalid_entity)
 			{
-				log("Player %i with id %u died", entity, data.id);
+				add_log("Player %i with id %u died", entity, data.id);
 				e.dead[entity] = true;
 			}
 		} break;
@@ -673,7 +673,7 @@ void parse_packet(ENetEvent event, s_config config)
 			{
 				e.name[entity] = data.name;
 				e.color[entity] = data.color;
-				log("Set %u's name to %s", data.id, e.name[entity].data);
+				add_log("Set %u's name to %s", data.id, e.name[entity].data);
 			}
 		} break;
 
@@ -708,7 +708,7 @@ void parse_packet(ENetEvent event, s_config config)
 		default:
 		{
 			//invalid_default_case;
-			log("unknown packet-type: %d", packet_id);
+			add_log("unknown packet-type: %d", packet_id);
 		}
 	}
 }
@@ -726,7 +726,7 @@ void enet_loop(ENetHost* client, int timeout, s_config config)
 
 			case ENET_EVENT_TYPE_CONNECT:
 			{
-				log("Connected!");
+				add_log("Connected!");
 
 				s_player_appearance_from_client data;
 				data.name = main_menu.player_name;
@@ -737,7 +737,7 @@ void enet_loop(ENetHost* client, int timeout, s_config config)
 
 			case ENET_EVENT_TYPE_DISCONNECT:
 			{
-				log("Disconnected!\n");
+				add_log("Disconnected!\n");
 				g_connected = false;
 				return;
 			} break;
@@ -749,7 +749,7 @@ void enet_loop(ENetHost* client, int timeout, s_config config)
 			} break;
 			default:
 			{
-				log("unknown ENET_EVENT-Type: %d", event.type);
+				add_log("unknown ENET_EVENT-Type: %d", event.type);
 			}
 		}
 	}
@@ -762,7 +762,7 @@ void revive_every_player(void)
 		if(!e.active[i]) { continue; }
 		if(!e.player_id[i]) { continue; }
 		e.dead[i] = false;
-		log("Revived player at index %i with id %u", i, e.player_id[i]);
+		add_log("Revived player at index %i with id %u", i, e.player_id[i]);
 	}
 }
 
@@ -1057,7 +1057,7 @@ s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
 		char* where = strstr(data, query.query);
 		if(!where)
 		{
-			log("Malformed config file. Generating default config");
+			add_log("Malformed config file. Generating default config");
 			return make_default_config(in_rng);
 		}
 		char* start = where + strlen(query.query);
@@ -1081,7 +1081,7 @@ s_config read_config_or_make_default(s_lin_arena* arena, s_rng* in_rng)
 			{
 				if(cursor - start <= 0)
 				{
-					log("Malformed config file. Generating default config");
+					add_log("Malformed config file. Generating default config");
 					return make_default_config(in_rng);
 				}
 
@@ -1153,7 +1153,7 @@ void save_config(s_config config)
 	b8 result = write_file("config.txt", builder.data, builder.len);
 	if(!result)
 	{
-		log("Failed to write config.txt");
+		add_log("Failed to write config.txt");
 	}
 }
 

@@ -1,4 +1,4 @@
-
+#pragma once
 struct s_game
 {
 	float time_alive_packet_timer;

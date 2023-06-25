@@ -1,4 +1,4 @@
-
+#pragma once
 u64 g_cycle_frequency;
 u64 g_start_cycles;
 

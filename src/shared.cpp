@@ -357,7 +357,7 @@ void spawn_system(s_level level)
 				} break;
 				default:
 				{
-					log("unkown projectile type: %d", proj_i);
+					add_log("unkown projectile type: %d", proj_i);
 				}
 			}
 		}
@@ -634,7 +634,7 @@ void projectile_spawner_system(int start, int count)
 				} break;
 				default:
 				{
-					log("unknown spawner-type: %d", e.particle_spawner[ii].type);
+					add_log("unknown spawner-type: %d", e.particle_spawner[ii].type);
 				}
 				
 			}
