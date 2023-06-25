@@ -33,6 +33,7 @@ enum e_packet
 	e_packet_cheat_next_level,
 	e_packet_cheat_previous_level,
 	e_packet_all_levels_beat,
+	e_packet_update_time_lived,
 };
 
 #pragma pack(push, 1)
@@ -175,8 +176,28 @@ struct s_cheat_previous_level_from_server
 	u32 seed;
 };
 
+struct s_update_time_lived_from_server
+{
+	u32 id;
+	float time_lived;
+};
 
 #pragma pack(pop)
+
+enum e_particle_spawner_type
+{
+	e_particle_spawner_default, //Not sure what to call the random 2 blob spawner thingamajig
+	e_particle_spawner_cross,
+	e_particle_spawner_x,
+	e_particle_spawner_type_count,
+};
+
+struct s_particle_spawner
+{
+	e_particle_spawner_type type;
+	float spawn_timer;
+	float spawn_delay;
+};
 
 enum e_entity_flag
 {
@@ -192,6 +213,7 @@ enum e_entity_flag
 	e_entity_flag_expire,
 	e_entity_flag_collide,
 	e_entity_flag_projectile_spawner,
+	e_entity_flag_increase_time_lived,
 	e_entity_flag_count,
 };
 
@@ -229,8 +251,7 @@ struct s_entities
 	float speed[c_max_entities];
 	float time_lived[c_max_entities];
 	float duration[c_max_entities];
-	float spawn_timer[c_max_entities];
-	float spawn_delay[c_max_entities];
+	s_particle_spawner particle_spawner[c_max_entities];
 	s_v4 color[c_max_entities];
 	s_name name[c_max_entities];
 };
